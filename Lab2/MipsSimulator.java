@@ -95,14 +95,13 @@ public class MipsSimulator {
 
 				if (opCode.equals("and") || opCode.equals("add") || opCode.equals("or") || 
 						opCode.equals("sub") || opCode.equals("slt")) {
-					this.printRFormat(opCode, param1, param2, param3);
+					this.printRFormat(opCode, param1, param2, param3, false, 0);
 				}
-				else if (opCode.equals("sll")) {
-					//this.printRFormat(opCode, p1, p2, p3);
-					System.out.println("print SLL in R format");
+				else if (opCode.equals("sll")) 
+					this.printRFormat(opCode, "0", param1, param2, true, Integer.parseInt(param3));
+				else {
+					this.printIFormat(opCode, param1, param2, param3);
 				}
-				else 
-					this.printIFormat();
 		}
 		else if (opCode.equals("lw") || opCode.equals("sw")) {
 			// Two arguments after op code	
@@ -127,32 +126,48 @@ public class MipsSimulator {
 				param2 = tokens.nextToken().trim();
 			if (tokens.hasMoreTokens()) 
 				param3 = tokens.nextToken().trim();
-			//System.out.println("Opcode: " + opCode);
-			//System.out.println("P1: " + param1);
-			//System.out.println("P2: " + param2);
-			//System.out.println("P3: " + param3);
 		}
 	}
 	
 	/* Used for parsing instructions with a label on the same line */
 	void parseInstructionWithLabel(String currentLine) {
 		currentLine = currentLine.substring(currentLine.indexOf(':') + 1).trim();
-		System.out.println(currentLine);
 		this.parseSimpleInstructions(currentLine);	
 	}
 	
-	void printRFormat(String opCode, String p1, String p2, String p3) {
-		//System.out.println("Opcode: " + opCode);
-		//System.out.println("P1: " + p1);
-		//System.out.println("P2: " + p2);
-		//System.out.println("P3: " + p3);
-		System.out.println("Opcode: " + Integer.toBinaryString(this.opCodes.get(opCode)));
-		System.out.println("RS: " + Integer.toBinaryString(this.registers.get(p2)));
-		System.out.println("RT: " + Integer.toBinaryString(this.registers.get(p3)));
+	void printRFormat(String opCode, String p1, String p2, String p3, boolean shift, int shiftBits) {
+		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
+				
+		if (shift) {			
+			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 5) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p3)), 5) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(shiftBits), 5) + " ");
+		} else {
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p3)), 5) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p1)), 5) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 5) + " ");			
+		}
+		
+		System.out.print(this.extendZeroes(Integer.toBinaryString(this.functions.get(opCode)), 6) + " ");
+		System.out.println("");
 	}
 	
-	void printIFormat() {
-		System.out.println("in I format");
+	
+	void printIFormat(String opCode, String p1, String p2, String immediate) {
+		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
+		System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
+		System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p1)), 5) + " ");
+		
+		if (!opCode.equals("beq") && !opCode.equals("bne")) {
+			//System.out.println("Integer.parseInt: " + Integer.toBinaryString(Integer.parseInt(immediate)));
+			System.out.print(this.extendZeroes(Integer.toBinaryString(Integer.parseInt(immediate)), 16) + " ");
+		} else {
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.labelsLocations.get(immediate)), 16) + " ");
+		}
+		
+		System.out.println("");
 	}
 	
 	void printJFormat() {
@@ -160,8 +175,12 @@ public class MipsSimulator {
 	}
 	
 	/* Helper method for extending zeroes */
-	void extendZeroes(String binaryString) {
-		//if (binaryString.length < )
+	String extendZeroes(String binaryString, int bits) {
+		String newString = binaryString;
+		for (int i = binaryString.length(); i < bits; i++) {
+			newString = "0" + newString;
+		}
+		return newString;
 	}
 	
 	/* Runs the simulator */
