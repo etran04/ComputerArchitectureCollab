@@ -91,9 +91,18 @@ public class MipsSimulator {
 				param3 = tokens.nextToken().trim();
 				
 				if (param3.contains("#")) 
-					param3 = param3.substring(0, param3.indexOf('#'));
+					param3 = param3.substring(0, param3.indexOf('#')).trim();
 
-				this.printRFormat(opCode, param1, param2, param3);
+				if (opCode.equals("and") || opCode.equals("add") || opCode.equals("or") || 
+						opCode.equals("sub") || opCode.equals("slt")) {
+					this.printRFormat(opCode, param1, param2, param3);
+				}
+				else if (opCode.equals("sll")) {
+					//this.printRFormat(opCode, p1, p2, p3);
+					System.out.println("print SLL in R format");
+				}
+				else 
+					this.printIFormat();
 		}
 		else if (opCode.equals("lw") || opCode.equals("sw")) {
 			// Two arguments after op code	
@@ -139,15 +148,20 @@ public class MipsSimulator {
 		//System.out.println("P3: " + p3);
 		System.out.println("Opcode: " + Integer.toBinaryString(this.opCodes.get(opCode)));
 		System.out.println("RS: " + Integer.toBinaryString(this.registers.get(p2)));
-		//System.out.println("RT: " + Integer.toBinaryString(this.registers.get(p3)));
+		System.out.println("RT: " + Integer.toBinaryString(this.registers.get(p3)));
 	}
 	
 	void printIFormat() {
-		
+		System.out.println("in I format");
 	}
 	
 	void printJFormat() {
 		
+	}
+	
+	/* Helper method for extending zeroes */
+	void extendZeroes(String binaryString) {
+		//if (binaryString.length < )
 	}
 	
 	/* Runs the simulator */
