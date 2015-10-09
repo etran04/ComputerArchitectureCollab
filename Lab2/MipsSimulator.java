@@ -76,13 +76,12 @@ public class MipsSimulator {
 	/* Used for parsing a simple instruction */
 	void parseSimpleInstructions(String currentLine, int lineNumber) {
 		StringTokenizer tokens = new StringTokenizer(currentLine, ",");
-		String[] temp = tokens.nextToken().trim().split(" ");
+		String[] temp = tokens.nextToken().trim().split("\\s+");
 		String opCode = temp[0].trim();
 		
 		String param1 = "";
 		String param2 = "";
 		String param3 = "";
-		
 		if (opCode.contains("$")) {
 			// Check for opCode where 1st params are not spaced correctly. (eg. beq$t0, ...)
 			param1 = opCode.substring(opCode.indexOf('$'));
@@ -190,7 +189,7 @@ public class MipsSimulator {
 			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 16) + " ");
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.functions.get(opCode)), 6) + " ");
 		} else  {
-			System.out.print(this.extendZeroes(Integer.toBinaryString(Short.parseShort(address) & 0xFFFF), 16) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.labelsLocations.get(address)), 26) + " ");
 		}
 
 		System.out.println("");
@@ -239,7 +238,6 @@ public class MipsSimulator {
                     else {
                         lineNumber++;
                     }
-
 				}
 			}
 			lineNumber = 0;
