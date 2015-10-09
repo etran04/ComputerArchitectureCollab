@@ -74,7 +74,7 @@ public class MipsSimulator {
 	}
 	
 	/* Used for parsing a simple instruction */
-	void parseSimpleInstructions(String currentLine) {
+	void parseSimpleInstructions(String currentLine, int lineNumber) {
 		StringTokenizer tokens = new StringTokenizer(currentLine, ",");
 		String[] temp = tokens.nextToken().trim().split(" ");
 		String opCode = temp[0].trim();
@@ -130,9 +130,9 @@ public class MipsSimulator {
 	}
 	
 	/* Used for parsing instructions with a label on the same line */
-	void parseInstructionWithLabel(String currentLine) {
+	void parseInstructionWithLabel(String currentLine, int lineNumber) {
 		currentLine = currentLine.substring(currentLine.indexOf(':') + 1).trim();
-		this.parseSimpleInstructions(currentLine);	
+		this.parseSimpleInstructions(currentLine, lineNumber);	
 	}
 	
 	void printRFormat(String opCode, String p1, String p2, String p3, boolean shift, int shiftBits) {
@@ -204,9 +204,11 @@ public class MipsSimulator {
 					String label = tokens.nextToken();
 					simulator.addLabel(label, lineNumber);
 				}
-				lineNumber++;
+				if (currLine.contains("")) {
+					lineNumber++;
+				}
 			}
-						
+			lineNumber = 0;
 			// Second pass
 			scanner = new Scanner(file);
 			while (scanner.hasNextLine()) {
@@ -217,7 +219,7 @@ public class MipsSimulator {
 					if (currLine.contains(":")) {
 						// Label with instruction line
 						if (currLine.charAt(currLine.length() - 1) != ':') 
-							simulator.parseInstructionWithLabel(currLine);
+							simulator.parseInstructionWithLabel(currLine, lineNumber);
 						else {
 							// Skip lines with only the label
 							//System.out.println("Label only line: " + currLine);
@@ -225,11 +227,14 @@ public class MipsSimulator {
 					}
 					// No label, just a simple instruction
 					else 
-						simulator.parseSimpleInstructions(currLine);
+						simulator.parseSimpleInstructions(currLine, lineNumber);
 				}
 				// It's a blank line or comment, skip it
 				else {
 					//System.out.println("Skipping...");
+				}
+				if(!currLine.equals("")) {
+					lineNumber++;
 				}
 				
 			}
