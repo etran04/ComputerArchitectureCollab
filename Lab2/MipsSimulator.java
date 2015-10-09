@@ -84,6 +84,7 @@ public class MipsSimulator {
 		String param1 = "";
 		String param2 = "";
 		String param3 = "";
+		
 		if (opCode.contains("$")) {
 			// Check for opCode where 1st params are not spaced correctly. (eg. beq$t0, ...)
 			param1 = opCode.substring(opCode.indexOf('$'));
@@ -196,7 +197,7 @@ public class MipsSimulator {
 		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
 
 		if (opCode.equals("jr")) {
-			System.out.println(this.extendZeroes(Integer.toBinaryString(this.registers.get(address)), 5) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(address)), 5) + " ");
 			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 16) + " ");
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.functions.get(opCode)), 6) + " ");
 		} else  {
