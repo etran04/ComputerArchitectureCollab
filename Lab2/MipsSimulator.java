@@ -186,11 +186,11 @@ public class MipsSimulator {
 		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
 
 		if (opCode.equals("jr")) {
-			//System.out.println("jr");
-			//System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(opCode)), 6) + " ");
-			//System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(address)), 26) + " ");
+			System.out.println(this.extendZeroes(Integer.toBinaryString(this.registers.get(address)), 5) + " ")
+			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 16) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.functions.get(opCode)), 6) + " ");
 		} else  {
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.labelsLocations.get(address)), 26) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(Short.parseShort(immediate) & 0xFFFF), 16) + " ");
 		}
 		
 		System.out.println("");
@@ -225,7 +225,12 @@ public class MipsSimulator {
 					if (currLine.contains(":")) {
 						StringTokenizer tokens = new StringTokenizer(currLine, ":");
 						String label = tokens.nextToken();
-						simulator.addLabel(label, lineNumber);
+						if(tokens.hasMoreTokens()) {
+							simulator.addLabel(label, lineNumber);
+						}
+						else {
+							simulator.addLabel(lable, lineNumber + 1);
+						}
 					}
 					lineNumber++;
 				}
