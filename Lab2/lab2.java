@@ -1,9 +1,16 @@
+/* 
+ * @authors: Jordan Tang & Eric Tran
+ * CSC 315
+ * Professor Seng
+ * Lab2
+ */
+
 import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.*;
 import java.io.*;
 
-public class MipsSimulator {
+public class lab2 {
 
 	private Hashtable<String, Integer> labelsLocations;
 	private Hashtable<String, Integer> registers;
@@ -11,7 +18,7 @@ public class MipsSimulator {
 	private Hashtable<String, Integer> functions; 
 	private static String invalidOp = "";
 	/* Default constructor for our simulator */
-	public MipsSimulator() {
+	public lab2() {
 		labelsLocations = new Hashtable<String, Integer>();
 		registers = new Hashtable<String, Integer>();
 		opCodes = new Hashtable<String, Integer>();
@@ -218,7 +225,7 @@ public class MipsSimulator {
 
 	/* Runs the simulator */
 	public static void main(String[] args) {
-		MipsSimulator simulator = new MipsSimulator();
+		lab2 simulator = new lab2();
 		
 		Scanner scanner = new Scanner(System.in);
 		
