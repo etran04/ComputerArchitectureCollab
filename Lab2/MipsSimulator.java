@@ -196,7 +196,8 @@ public class MipsSimulator {
 		for (int i = binaryString.length(); i < bits; i++) {
 			newString = "0" + newString;
 		}
-c	}
+		return newString;
+	}
 	
 	/* Runs the simulator */
 	public static void main(String[] args) {
