@@ -83,13 +83,26 @@ public class MipsSimulator {
 		String param2 = "";
 		String param3 = "";
 		
+		if (opCode.contains("$")) {
+			// Check for opCode where 1st params are not spaced correctly. (eg. beq$t0, ...)
+			param1 = opCode.substring(opCode.indexOf('$'));
+			opCode = opCode.substring(0, opCode.indexOf('$'));
+
+			if (tokens.hasMoreTokens())
+				param2 = tokens.nextToken().trim();
+			if (tokens.hasMoreTokens()) 
+				param3 = tokens.nextToken().trim();
+		}
+		
 		if (opCode.equals("and") || opCode.equals("or") ||  opCode.equals("add") || 
 			opCode.equals("addi") || opCode.equals("sll") || opCode.equals("sub") ||
 			opCode.equals("slt") || opCode.equals("beq") || opCode.equals("bne")) {
-				
-				param1 = temp[1].trim();
-				param2 = tokens.nextToken().trim();
-				param3 = tokens.nextToken().trim();
+				if (param1.equals(""))
+					param1 = temp[1].trim();
+				if (param2.equals(""))
+					param2 = tokens.nextToken().trim();
+				if (param3.equals(""))
+					param3 = tokens.nextToken().trim();
 				
 				if (param3.contains("#")) 
 					param3 = param3.substring(0, param3.indexOf('#')).trim();
@@ -102,33 +115,26 @@ public class MipsSimulator {
 					this.printRFormat(opCode, "0", param1, param2, true, Integer.parseInt(param3));
 				}
 				else {
-					this.printIFormat(opCode, param1, param2, param3);
+					this.printIFormat(opCode, param1, param2, param3, lineNumber);
 				}
 		}
 		else if (opCode.equals("lw") || opCode.equals("sw")) {
 			// Two arguments after op code	
-
-			param1 = temp[1].trim();
-			param2 = tokens.nextToken().trim();
+			if (param1.equals(""))
+				param1 = temp[1].trim();
+			if (param2.equals(""))
+				param2 = tokens.nextToken().trim();
+			
 			param3 = param2.substring(param2.indexOf("$"), param2.indexOf("$") + 3);
 			param2 = param2.substring(0, param2.indexOf('$') - 1);
-			this.printIFormat(opCode, param1, param3, param2);
+			
+			this.printIFormat(opCode, param1, param3, param2, lineNumber);
 		}
 		else if (opCode.equals("j") || opCode.equals("jr") || opCode.equals("jal")) {
 			// Single argument after op code
-			param1 = temp[1].trim();
+			if (param1.equals(""))
+				param1 = temp[1].trim();
 			this.printJFormat(opCode, param1);
-		}
-		else if (!opCode.contains(" ")) {
-			// Check for opCode where 1st params are not spaced correctly. (eg. beq$t0, ...)
-			param1 = opCode.substring(opCode.indexOf('$'));
-			opCode = opCode.substring(0, opCode.indexOf('$'));
-			if (tokens.hasMoreTokens())
-				param2 = tokens.nextToken().trim();
-			if (tokens.hasMoreTokens()) 
-				param3 = tokens.nextToken().trim();
-			
-			System.out.println("Error opcode");
 		}
 	}
 	
@@ -159,17 +165,17 @@ public class MipsSimulator {
 	}
 	
 	/* Helper method for printing I format */
-	void printIFormat(String opCode, String p1, String p2, String immediate) {
+	void printIFormat(String opCode, String p1, String p2, String immediate, int currentLineNumber) {
 		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
 		
 		if (!opCode.equals("beq") && !opCode.equals("bne")) {
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p1)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(Integer.parseInt(immediate)), 16) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(Short.parseShort(immediate) & 0xFFFF), 16) + " ");
 		} else {
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p1)), 5) + " ");
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.labelsLocations.get(immediate)), 16) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString((this.labelsLocations.get(immediate) - currentLineNumber - 1) & 0xFFFF), 16) + " ");
 		}
 		
 		System.out.println("");
@@ -203,9 +209,9 @@ public class MipsSimulator {
 	public static void main(String[] args) {
 		MipsSimulator simulator = new MipsSimulator();
 		
-		System.out.println("Enter .asm file: ");
+		//System.out.println("Enter .asm file: ");
 		Scanner scanner = new Scanner(System.in);
-		File file = new File(scanner.next());
+		File file = new File(args[0]);
 		
 		try {
 			scanner = new Scanner(file);
@@ -235,7 +241,7 @@ public class MipsSimulator {
 					if (currLine.contains(":")) {
 						// Label with instruction line
 						if (currLine.charAt(currLine.length() - 1) != ':') 
-							simulator.parseInstructionWithLabel(currLine, lineNumber);
+							simulator.parseInstructionWithLabel(currLine, lineNumber++);
 						else {
 							// Skip lines with only the label
 							//System.out.println("Label only line: " + currLine);
@@ -243,16 +249,12 @@ public class MipsSimulator {
 					}
 					// No label, just a simple instruction
 					else 
-						simulator.parseSimpleInstructions(currLine, lineNumber);
+						simulator.parseSimpleInstructions(currLine, lineNumber++);
 				}
 				// It's a blank line or comment, skip it
 				else {
 					//System.out.println("Skipping...");
 				}
-				if(!currLine.equals("")) {
-					lineNumber++;
-				}
-				
 			}
 			
 		}
