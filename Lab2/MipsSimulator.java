@@ -82,10 +82,11 @@ public class MipsSimulator {
 		String param1 = "";
 		String param2 = "";
 		String param3 = "";
-
+		
 		if (opCode.equals("and") || opCode.equals("or") ||  opCode.equals("add") || 
 			opCode.equals("addi") || opCode.equals("sll") || opCode.equals("sub") ||
 			opCode.equals("slt") || opCode.equals("beq") || opCode.equals("bne")) {
+				
 				param1 = temp[1].trim();
 				param2 = tokens.nextToken().trim();
 				param3 = tokens.nextToken().trim();
@@ -97,26 +98,26 @@ public class MipsSimulator {
 						opCode.equals("sub") || opCode.equals("slt")) {
 					this.printRFormat(opCode, param1, param2, param3, false, 0);
 				}
-				else if (opCode.equals("sll")) 
+				else if (opCode.equals("sll")) {
 					this.printRFormat(opCode, "0", param1, param2, true, Integer.parseInt(param3));
+				}
 				else {
 					this.printIFormat(opCode, param1, param2, param3);
 				}
 		}
 		else if (opCode.equals("lw") || opCode.equals("sw")) {
 			// Two arguments after op code	
+
 			param1 = temp[1].trim();
 			param2 = tokens.nextToken().trim();
-			
-			System.out.println("Opcode: " + opCode);
-			System.out.println("P1: " + param1);
-			System.out.println("P2: " + param2);
+			param3 = param2.substring(param2.indexOf("$"), param2.indexOf("$") + 3);
+			param2 = param2.substring(0, param2.indexOf('$') - 1);
+			this.printIFormat(opCode, param1, param3, param2);
 		}
 		else if (opCode.equals("j") || opCode.equals("jr") || opCode.equals("jal")) {
 			// Single argument after op code
 			param1 = temp[1].trim();
-			System.out.println("Opcode: " + opCode);
-			System.out.println("P1: " + param1);
+			this.printJFormat(opCode, param1);
 		}
 		else if (!opCode.contains(" ")) {
 			// Check for opCode where 1st params are not spaced correctly. (eg. beq$t0, ...)
@@ -126,6 +127,8 @@ public class MipsSimulator {
 				param2 = tokens.nextToken().trim();
 			if (tokens.hasMoreTokens()) 
 				param3 = tokens.nextToken().trim();
+			
+			System.out.println("Error opcode");
 		}
 	}
 	
@@ -135,6 +138,7 @@ public class MipsSimulator {
 		this.parseSimpleInstructions(currentLine);	
 	}
 	
+	/* Helper method for printing R format */
 	void printRFormat(String opCode, String p1, String p2, String p3, boolean shift, int shiftBits) {
 		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
 				
@@ -154,24 +158,36 @@ public class MipsSimulator {
 		System.out.println("");
 	}
 	
-	
+	/* Helper method for printing I format */
 	void printIFormat(String opCode, String p1, String p2, String immediate) {
 		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
-		System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
-		System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p1)), 5) + " ");
 		
 		if (!opCode.equals("beq") && !opCode.equals("bne")) {
-			//System.out.println("Integer.parseInt: " + Integer.toBinaryString(Integer.parseInt(immediate)));
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p1)), 5) + " ");
 			System.out.print(this.extendZeroes(Integer.toBinaryString(Integer.parseInt(immediate)), 16) + " ");
 		} else {
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p1)), 5) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.labelsLocations.get(immediate)), 16) + " ");
 		}
 		
 		System.out.println("");
 	}
 	
-	void printJFormat() {
+	/* Helper method for printing J format */
+	void printJFormat(String opCode, String address) {
+		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
+
+		if (opCode.equals("jr")) {
+			//System.out.println("jr");
+			//System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(opCode)), 6) + " ");
+			//System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(address)), 26) + " ");
+		} else  {
+			System.out.print(this.extendZeroes(Integer.toBinaryString(this.labelsLocations.get(address)), 26) + " ");
+		}
 		
+		System.out.println("");
 	}
 	
 	/* Helper method for extending zeroes */
@@ -199,12 +215,14 @@ public class MipsSimulator {
 			int lineNumber = 0;
 			while (scanner.hasNextLine()) {
 				currLine = scanner.nextLine().trim();
-				if (currLine.contains(":")) {
-					StringTokenizer tokens = new StringTokenizer(currLine, ":");
-					String label = tokens.nextToken();
-					simulator.addLabel(label, lineNumber);
+				if (currLine.length() != 0 && currLine.charAt(0) != '#') {
+					if (currLine.contains(":")) {
+						StringTokenizer tokens = new StringTokenizer(currLine, ":");
+						String label = tokens.nextToken();
+						simulator.addLabel(label, lineNumber);
+					}
+					lineNumber++;
 				}
-				lineNumber++;
 			}
 						
 			// Second pass
