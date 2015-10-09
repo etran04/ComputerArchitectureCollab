@@ -186,16 +186,16 @@ public class MipsSimulator {
 		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
 
 		if (opCode.equals("jr")) {
-			System.out.println(this.extendZeroes(Integer.toBinaryString(this.registers.get(address)), 5) + " ")
+			System.out.println(this.extendZeroes(Integer.toBinaryString(this.registers.get(address)), 5) + " ");
 			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 16) + " ");
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.functions.get(opCode)), 6) + " ");
 		} else  {
-			System.out.print(this.extendZeroes(Integer.toBinaryString(Short.parseShort(immediate) & 0xFFFF), 16) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(Short.parseShort(address) & 0xFFFF), 16) + " ");
 		}
-		
+
 		System.out.println("");
 	}
-	
+
 	/* Helper method for extending zeroes */
 	String extendZeroes(String binaryString, int bits) {
 		String newString = binaryString;
@@ -204,7 +204,7 @@ public class MipsSimulator {
 		}
 		return newString;
 	}
-	
+
 	/* Runs the simulator */
 	public static void main(String[] args) {
 		MipsSimulator simulator = new MipsSimulator();
@@ -212,7 +212,7 @@ public class MipsSimulator {
 		//System.out.println("Enter .asm file: ");
 		Scanner scanner = new Scanner(System.in);
 		File file = new File(args[0]);
-		
+		String nextLabel = "";
 		try {
 			scanner = new Scanner(file);
 			String currLine = "";
@@ -226,13 +226,20 @@ public class MipsSimulator {
 						StringTokenizer tokens = new StringTokenizer(currLine, ":");
 						String label = tokens.nextToken();
 						if(tokens.hasMoreTokens()) {
-							simulator.addLabel(label, lineNumber);
+							simulator.addLabel(label, lineNumber++);
 						}
 						else {
-							simulator.addLabel(lable, lineNumber + 1);
+							nextLabel = label;
 						}
 					}
-					lineNumber++;
+					else if(!nextLabel.equals("")){
+                        simulator.addLabel(nextLabel, lineNumber++);
+                        nextLabel = "";
+                    }
+                    else {
+                        lineNumber++;
+                    }
+
 				}
 			}
 			lineNumber = 0;
