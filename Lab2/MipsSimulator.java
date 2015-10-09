@@ -1,3 +1,5 @@
+import org.omg.CORBA.DynAnyPackage.Invalid;
+
 import java.util.*;
 import java.io.*;
 
@@ -7,7 +9,7 @@ public class MipsSimulator {
 	private Hashtable<String, Integer> registers;
 	private Hashtable<String, Integer> opCodes;
 	private Hashtable<String, Integer> functions; 
-	
+	private static String invalidOp = "";
 	/* Default constructor for our simulator */
 	public MipsSimulator() {
 		labelsLocations = new Hashtable<String, Integer>();
@@ -74,7 +76,7 @@ public class MipsSimulator {
 	}
 	
 	/* Used for parsing a simple instruction */
-	void parseSimpleInstructions(String currentLine, int lineNumber) {
+	void parseSimpleInstructions(String currentLine, int lineNumber) throws InvalidCommandException{
 		StringTokenizer tokens = new StringTokenizer(currentLine, ",");
 		String[] temp = tokens.nextToken().trim().split("\\s+");
 		String opCode = temp[0].trim();
@@ -135,12 +137,21 @@ public class MipsSimulator {
 				param1 = temp[1].trim();
 			this.printJFormat(opCode, param1);
 		}
+        else {
+            invalidOp = opCode;
+            throw new InvalidCommandException();
+        }
 	}
 	
 	/* Used for parsing instructions with a label on the same line */
-	void parseInstructionWithLabel(String currentLine, int lineNumber) {
+	void parseInstructionWithLabel(String currentLine, int lineNumber) throws InvalidCommandException {
 		currentLine = currentLine.substring(currentLine.indexOf(':') + 1).trim();
-		this.parseSimpleInstructions(currentLine, lineNumber);	
+        try {
+            this.parseSimpleInstructions(currentLine, lineNumber);
+        }
+        catch (InvalidCommandException e) {
+            throw new InvalidCommandException();
+        }
 	}
 	
 	/* Helper method for printing R format */
@@ -270,8 +281,19 @@ public class MipsSimulator {
 		}
 		catch (FileNotFoundException e) {
 			System.out.println("File not found!");
-		}
-		
-	}
+		} catch (InvalidCommandException e) {
+            System.out.println("invalid instruction: " + invalidOp);
+        }
+
+    }
 	
+}
+
+//Class for unsupported command exceptions
+class InvalidCommandException extends Exception {
+    public InvalidCommandException(){}
+
+    public InvalidCommandException(String message) {
+        super(message);
+    }
 }
