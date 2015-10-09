@@ -198,7 +198,7 @@ public class MipsSimulator {
 
 		if (opCode.equals("jr")) {
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(address)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 16) + " ");
+			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 15) + " ");
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.functions.get(opCode)), 6) + " ");
 		} else  {
 			System.out.print(this.extendZeroes(Integer.toBinaryString(this.labelsLocations.get(address)), 26) + " ");
