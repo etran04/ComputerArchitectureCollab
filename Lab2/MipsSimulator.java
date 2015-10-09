@@ -288,15 +288,10 @@ public class MipsSimulator {
 			catch (FileNotFoundException e) {
 				System.out.println("File not found!");
 			}
-<<<<<<< HEAD
-			
+			catch (InvalidCommandException e) {
+				System.out.println("invalid instruction: " + invalidOp);
+			}
 		}
-		catch (FileNotFoundException e) {
-			System.out.println("File not found!");
-		} catch (InvalidCommandException e) {
-            System.out.println("invalid instruction: " + invalidOp);
-        }
-
     }
 }
 
