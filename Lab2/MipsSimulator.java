@@ -208,70 +208,76 @@ public class MipsSimulator {
 	public static void main(String[] args) {
 		MipsSimulator simulator = new MipsSimulator();
 		
-		//System.out.println("Enter .asm file: ");
 		Scanner scanner = new Scanner(System.in);
-		File file = new File(args[0]);
-		String nextLabel = "";
-		try {
-			scanner = new Scanner(file);
-			String currLine = "";
-			
-			// First pass
-			int lineNumber = 0;
-			while (scanner.hasNextLine()) {
-				currLine = scanner.nextLine().trim();
-				if (currLine.length() != 0 && currLine.charAt(0) != '#') {
-					if (currLine.contains(":")) {
-						StringTokenizer tokens = new StringTokenizer(currLine, ":");
-						String label = tokens.nextToken();
-						if(tokens.hasMoreTokens()) {
-							simulator.addLabel(label, lineNumber++);
-						}
-						else {
-							nextLabel = label;
-						}
-					}
-					else if(!nextLabel.equals("")){
-                        simulator.addLabel(nextLabel, lineNumber++);
-                        nextLabel = "";
-                    }
-                    else {
-                        lineNumber++;
-                    }
-				}
-			}
-			lineNumber = 0;
-			// Second pass
-			scanner = new Scanner(file);
-			while (scanner.hasNextLine()) {
-				currLine = scanner.nextLine().trim();
-				// Line is not blank, and doesn't start with a comment 
-				if (currLine.length() != 0 && currLine.charAt(0) != '#') {
-					// There is a label
-					if (currLine.contains(":")) {
-						// Label with instruction line
-						if (currLine.charAt(currLine.length() - 1) != ':') 
-							simulator.parseInstructionWithLabel(currLine, lineNumber++);
-						else {
-							// Skip lines with only the label
-							//System.out.println("Label only line: " + currLine);
-						}
-					}
-					// No label, just a simple instruction
-					else 
-						simulator.parseSimpleInstructions(currLine, lineNumber++);
-				}
-				// It's a blank line or comment, skip it
-				else {
-					//System.out.println("Skipping...");
-				}
-			}
-			
-		}
-		catch (FileNotFoundException e) {
-			System.out.println("File not found!");
-		}
 		
+		if (args.length == 0) {
+			System.out.println("Input file needed!");
+		}
+		else {
+			
+			File file = new File(args[0]);
+			String nextLabel = "";
+			try {
+				scanner = new Scanner(file);
+				String currLine = "";
+				
+				// First pass
+				int lineNumber = 0;
+				while (scanner.hasNextLine()) {
+					currLine = scanner.nextLine().trim();
+					if (currLine.length() != 0 && currLine.charAt(0) != '#') {
+						if (currLine.contains(":")) {
+							StringTokenizer tokens = new StringTokenizer(currLine, ":");
+							String label = tokens.nextToken();
+							if(tokens.hasMoreTokens()) {
+								simulator.addLabel(label, lineNumber++);
+							}
+							else {
+								nextLabel = label;
+							}
+						}
+						else if(!nextLabel.equals("")){
+	                        simulator.addLabel(nextLabel, lineNumber++);
+	                        nextLabel = "";
+	                    }
+	                    else {
+	                        lineNumber++;
+	                    }
+					}
+				}
+				
+				lineNumber = 0;
+				// Second pass
+				scanner = new Scanner(file);
+				while (scanner.hasNextLine()) {
+					currLine = scanner.nextLine().trim();
+					// Line is not blank, and doesn't start with a comment 
+					if (currLine.length() != 0 && currLine.charAt(0) != '#') {
+						// There is a label
+						if (currLine.contains(":")) {
+							// Label with instruction line
+							if (currLine.charAt(currLine.length() - 1) != ':') 
+								simulator.parseInstructionWithLabel(currLine, lineNumber++);
+							else {
+								// Skip lines with only the label
+								//System.out.println("Label only line: " + currLine);
+							}
+						}
+						// No label, just a simple instruction
+						else 
+							simulator.parseSimpleInstructions(currLine, lineNumber++);
+					}
+					// It's a blank line or comment, skip it
+					else {
+						//System.out.println("Skipping...");
+					}
+				}
+				
+			}
+			catch (FileNotFoundException e) {
+				System.out.println("File not found!");
+			}
+		}
 	}
 	
 }
