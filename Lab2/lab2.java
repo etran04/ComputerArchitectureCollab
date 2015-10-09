@@ -5,8 +5,6 @@
  * Lab2
  */
 
-import org.omg.CORBA.DynAnyPackage.Invalid;
-
 import java.util.*;
 import java.io.*;
 
