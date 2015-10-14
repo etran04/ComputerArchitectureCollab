@@ -8,19 +8,22 @@
 import java.util.*;
 import java.io.*;
 
-public class lab2 {
+public class lab3 {
 
 	private Hashtable<String, Integer> labelsLocations;
 	private Hashtable<String, Integer> registers;
 	private Hashtable<String, Integer> opCodes;
 	private Hashtable<String, Integer> functions; 
 	private static String invalidOp = "";
+	private int[] dataMemory;
+	
 	/* Default constructor for our simulator */
-	public lab2() {
+	public lab3() {
 		labelsLocations = new Hashtable<String, Integer>();
 		registers = new Hashtable<String, Integer>();
 		opCodes = new Hashtable<String, Integer>();
 		functions = new Hashtable<String, Integer>();
+		dataMemory = new int[8192];
 		
 		registers.put("$zero", 0);
 		registers.put("$0", 0);
@@ -223,7 +226,7 @@ public class lab2 {
 
 	/* Runs the simulator */
 	public static void main(String[] args) {
-		lab2 simulator = new lab2();
+		lab3 simulator = new lab3();
 		
 		Scanner scanner = new Scanner(System.in);
 		
@@ -275,18 +278,10 @@ public class lab2 {
 							// Label with instruction line
 							if (currLine.charAt(currLine.length() - 1) != ':') 
 								simulator.parseInstructionWithLabel(currLine, lineNumber++);
-							else {
-								// Skip lines with only the label
-								//System.out.println("Label only line: " + currLine);
-							}
 						}
 						// No label, just a simple instruction
 						else 
 							simulator.parseSimpleInstructions(currLine, lineNumber++);
-					}
-					// It's a blank line or comment, skip it
-					else {
-						//System.out.println("Skipping...");
 					}
 				}
 				
