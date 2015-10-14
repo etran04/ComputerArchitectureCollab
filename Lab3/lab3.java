@@ -15,6 +15,7 @@ public class lab3 {
 	private Hashtable<String, Integer> opCodes;
 	private Hashtable<String, Integer> functions; 
 	private static String invalidOp = "";
+	private ArrayList<Instruction> instructions;
 	private int[] dataMemory;
 	
 	/* Default constructor for our simulator */
@@ -23,6 +24,7 @@ public class lab3 {
 		registers = new Hashtable<String, Integer>();
 		opCodes = new Hashtable<String, Integer>();
 		functions = new Hashtable<String, Integer>();
+		instructions = new ArrayList<Instruction>();
 		dataMemory = new int[8192];
 		
 		registers.put("$zero", 0);
@@ -83,6 +85,13 @@ public class lab3 {
 		labelsLocations.put(label, lineNumber);
 	}
 	
+	/* Helper method for printint out list of instructions */
+	void printInstructions() {
+		for (int i = 0; i < instructions.size(); i++) {
+			instructions.get(i).printSummary();
+		}
+	}
+	
 	/* Used for parsing a simple instruction */
 	void parseSimpleInstructions(String currentLine, int lineNumber) throws InvalidCommandException{
 		StringTokenizer tokens = new StringTokenizer(currentLine, ",");
@@ -117,16 +126,12 @@ public class lab3 {
 				if (param3.contains("#")) 
 					param3 = param3.substring(0, param3.indexOf('#')).trim();
 
-				if (opCode.equals("and") || opCode.equals("add") || opCode.equals("or") || 
-						opCode.equals("sub") || opCode.equals("slt")) {
-					this.printRFormat(opCode, param1, param2, param3, false, 0);
-				}
-				else if (opCode.equals("sll")) {
-					this.printRFormat(opCode, "0", param1, param2, true, Integer.parseInt(param3));
-				}
-				else {
-					this.printIFormat(opCode, param1, param2, param3, lineNumber);
-				}
+				if (opCode.equals("and") || opCode.equals("add") || opCode.equals("or") || opCode.equals("sub") || opCode.equals("slt")) 
+					instructions.add(new Instruction(opCode, param2, param3, param1, false));
+				else if (opCode.equals("sll")) 
+					instructions.add(new Instruction(opCode, param2, param1, param3));
+				else 
+					instructions.add(new Instruction(opCode, param2, param3, param1, true));
 		}
 		else if (opCode.equals("lw") || opCode.equals("sw")) {
 			// Two arguments after op code	
@@ -138,13 +143,15 @@ public class lab3 {
 			param3 = param2.substring(param2.indexOf("$"), param2.indexOf("$") + 3);
 			param2 = param2.substring(0, param2.indexOf('$') - 1);
 			
-			this.printIFormat(opCode, param1, param3, param2, lineNumber);
+			instructions.add(new Instruction(opCode, param3, param2, param1, false));
 		}
 		else if (opCode.equals("j") || opCode.equals("jr") || opCode.equals("jal")) {
 			// Single argument after op code
 			if (param1.equals(""))
 				param1 = temp[1].trim();
-			this.printJFormat(opCode, param1);
+			//System.out.println("Saving J Format Instruction...");
+			instructions.add(new Instruction(opCode, param1));
+			//this.printJFormat(opCode, param1);
 		}
         else {
             invalidOp = opCode;
@@ -284,7 +291,7 @@ public class lab3 {
 							simulator.parseSimpleInstructions(currLine, lineNumber++);
 					}
 				}
-				
+				simulator.printInstructions();
 			}
 			catch (FileNotFoundException e) {
 				System.out.println("File not found!");
