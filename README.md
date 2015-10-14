@@ -7,4 +7,4 @@
 [Link to Lab2 specs](http://users.csc.calpoly.edu/~jseng/Fall15/lab2/lab2.html)
 
 ## Lab3
-[Link to Lab3 specs](http://users.csc.calpoly.edu/~jseng/Fall15/lab2/lab3.html)
+[Link to Lab3 specs](http://users.csc.calpoly.edu/~jseng/Fall15/lab3/Lab3.html)
