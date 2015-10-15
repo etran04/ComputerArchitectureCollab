@@ -11,6 +11,7 @@ import java.io.*;
 public class lab3 {
 
 	private Hashtable<String, Integer> labelsLocations;
+	private Hashtable<Integer, String> registersToString;
 	private static String invalidOp = "";
 	
 	private ArrayList<Instruction> instructions;
@@ -18,13 +19,44 @@ public class lab3 {
 	private int[] dataMemory;
 	private int[] registers;
 	
+	
 	/* Default constructor for our simulator */
 	public lab3() {
-		labelsLocations = new Hashtable<String, Integer>();
-		instructions = new ArrayList<Instruction>();
-		dataMemory = new int[8192];
-		registers = new int[32];
-		pc = 0;
+		this.labelsLocations = new Hashtable<String, Integer>();
+		this.registersToString = new Hashtable<Integer, String>();
+		this.instructions = new ArrayList<Instruction>();
+		this.dataMemory = new int[8192];
+		this.registers = new int[32];
+		
+		this.registersToString.put(0, "$0");
+		this.registersToString.put(2, "$v0");
+		this.registersToString.put(3, "$v1");
+		this.registersToString.put(4, "$a0");
+		this.registersToString.put(5, "$a1");
+		this.registersToString.put(6, "$a2");
+		this.registersToString.put(7, "$a3");
+		this.registersToString.put(8, "$t0");
+		this.registersToString.put(9, "$t1");
+		this.registersToString.put(10, "$t2");
+		this.registersToString.put(11, "$t3");
+		this.registersToString.put(12, "$t4");
+		this.registersToString.put(13, "$t5");
+		this.registersToString.put(14, "$t6");
+		this.registersToString.put(15, "$t7");
+		this.registersToString.put(16, "$s0");
+		this.registersToString.put(17, "$s1");
+		this.registersToString.put(18, "$s2");
+		this.registersToString.put(19, "$s3");		
+		this.registersToString.put(20, "$s4");
+		this.registersToString.put(21, "$s5");
+		this.registersToString.put(22, "$s6");
+		this.registersToString.put(23, "$s7");
+		this.registersToString.put(24, "$t8");
+		this.registersToString.put(25, "$t9");
+		this.registersToString.put(29, "$sp");
+		this.registersToString.put(31, "$ra");
+		
+		this.pc = 0;
 	}
 	
 	/* Used for adding a label to a hashtable */
@@ -114,12 +146,19 @@ public class lab3 {
         }
 	}
 	
-	/* Used to clear all registers to 0 */
+	/* Used to clear all this.registersToString to 0, and prints them*/
 	void dumpRegisters() {
-		this.pc = 0;
+		System.out.println("\npc = " + this.pc);
 		for (int i = 0; i < this.registers.length; i++) {
 			registers[i] = 0;
+			if (i != 1 && i != 26 && i != 27 && i != 28 && i != 30){
+				if (i % 4 == 0 && i != 0) 
+					System.out.println(this.registersToString.get(i) + " = " + 0 + " \t");	
+				else 
+					System.out.print(this.registersToString.get(i) + " = " + 0 + " \t");
+			}
 		}
+		System.out.println("\n");
 	}
 	
 	/* Used for the 'h' command. Prints out the help */
@@ -130,7 +169,7 @@ public class lab3 {
 		System.out.println("s num = step through num instructions of the program");
 		System.out.println("r = run until the program ends");
 		System.out.println("m num1 num2 = display data memory from location num1 to num2");
-		System.out.println(	"c = clear all registers, memory, and the program counter to 0");
+		System.out.println(	"c = clear all this.registersToString, memory, and the program counter to 0");
 		System.out.println(	"q = exit the program\n");
 	}
 	
@@ -204,7 +243,6 @@ public class lab3 {
 						simulator.printHelp();
 						break;
 					case 'd':
-						System.out.println("Dump registers");
 						simulator.dumpRegisters();
 						break;
 					case 's':
