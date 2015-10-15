@@ -15,6 +15,7 @@ public class lab3 {
 	private Hashtable<String, Integer> opCodes;
 	private Hashtable<String, Integer> functions; 
 	private static String invalidOp = "";
+	
 	private ArrayList<Instruction> instructions;
 	private int[] dataMemory;
 	
@@ -24,6 +25,7 @@ public class lab3 {
 		registers = new Hashtable<String, Integer>();
 		opCodes = new Hashtable<String, Integer>();
 		functions = new Hashtable<String, Integer>();
+		
 		instructions = new ArrayList<Instruction>();
 		dataMemory = new int[8192];
 		
@@ -90,6 +92,7 @@ public class lab3 {
 		for (int i = 0; i < instructions.size(); i++) {
 			instructions.get(i).printSummary();
 		}
+		System.out.println("List size: " + instructions.size());
 	}
 	
 	/* Used for parsing a simple instruction */
@@ -98,9 +101,7 @@ public class lab3 {
 		String[] temp = tokens.nextToken().trim().split("\\s+");
 		String opCode = temp[0].trim();
 		
-		String param1 = "";
-		String param2 = "";
-		String param3 = "";
+		String param1 = "", param2 = "", param3 = "";
 		
 		if (opCode.contains("$")) {
 			// Check for opCode where 1st params are not spaced correctly. (eg. beq$t0, ...)
@@ -149,9 +150,7 @@ public class lab3 {
 			// Single argument after op code
 			if (param1.equals(""))
 				param1 = temp[1].trim();
-			//System.out.println("Saving J Format Instruction...");
 			instructions.add(new Instruction(opCode, param1));
-			//this.printJFormat(opCode, param1);
 		}
         else {
             invalidOp = opCode;
@@ -169,68 +168,6 @@ public class lab3 {
             throw new InvalidCommandException();
         }
 	}
-	
-	/* Helper method for printing R format */
-	void printRFormat(String opCode, String p1, String p2, String p3, boolean shift, int shiftBits) {
-		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
-				
-		if (shift) {			
-			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p3)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(shiftBits), 5) + " ");
-		} else {
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p3)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p1)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 5) + " ");			
-		}
-		
-		System.out.print(this.extendZeroes(Integer.toBinaryString(this.functions.get(opCode)), 6) + " ");
-		System.out.println("");
-	}
-	
-	/* Helper method for printing I format */
-	void printIFormat(String opCode, String p1, String p2, String immediate, int currentLineNumber) {
-		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
-		
-		if (!opCode.equals("beq") && !opCode.equals("bne")) {
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p1)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(Short.parseShort(immediate) & 0xFFFF), 16) + " ");
-		} else {
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p1)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(p2)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString((this.labelsLocations.get(immediate) - currentLineNumber - 1) & 0xFFFF), 16) + " ");
-		}
-		
-		System.out.println("");
-	}
-	
-	/* Helper method for printing J format */
-	void printJFormat(String opCode, String address) {
-		System.out.print(this.extendZeroes(Integer.toBinaryString(this.opCodes.get(opCode)), 6) + " ");
-
-		if (opCode.equals("jr")) {
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.registers.get(address)), 5) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(0), 15) + " ");
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.functions.get(opCode)), 6) + " ");
-		} else  {
-			System.out.print(this.extendZeroes(Integer.toBinaryString(this.labelsLocations.get(address)), 26) + " ");
-		}
-
-		System.out.println("");
-	}
-
-	/* Helper method for extending zeroes */
-	String extendZeroes(String binaryString, int bits) {
-		String newString = binaryString;
-		for (int i = binaryString.length(); i < bits; i++) {
-			newString = "0" + newString;
-		}
-		return newString;
-	}
-
 	/* Runs the simulator */
 	public static void main(String[] args) {
 		lab3 simulator = new lab3();
@@ -238,14 +175,14 @@ public class lab3 {
 		Scanner scanner = new Scanner(System.in);
 		
 		if (args.length == 0) {
-			System.out.println("Input file needed!");
+			System.out.println("usage: java lab3 [.asm file] [optional script file]");
 		}
-		else {
-			
-			File file = new File(args[0]);
+		// Interactive mode
+		else if (args.length == 1){
+			File asmFile = new File(args[0]);
 			String nextLabel = "";
 			try {
-				scanner = new Scanner(file);
+				scanner = new Scanner(asmFile);
 				String currLine = "";
 				
 				// First pass
@@ -256,26 +193,23 @@ public class lab3 {
 						if (currLine.contains(":")) {
 							StringTokenizer tokens = new StringTokenizer(currLine, ":");
 							String label = tokens.nextToken();
-							if(tokens.hasMoreTokens()) {
+							if(tokens.hasMoreTokens()) 
 								simulator.addLabel(label, lineNumber++);
-							}
-							else {
+							else 
 								nextLabel = label;
-							}
 						}
 						else if(!nextLabel.equals("")){
 	                        simulator.addLabel(nextLabel, lineNumber++);
 	                        nextLabel = "";
 	                    }
-	                    else {
+	                    else 
 	                        lineNumber++;
-	                    }
 					}
 				}
 				
 				lineNumber = 0;
 				// Second pass
-				scanner = new Scanner(file);
+				scanner = new Scanner(asmFile);
 				while (scanner.hasNextLine()) {
 					currLine = scanner.nextLine().trim();
 					// Line is not blank, and doesn't start with a comment 
@@ -291,7 +225,39 @@ public class lab3 {
 							simulator.parseSimpleInstructions(currLine, lineNumber++);
 					}
 				}
+				scanner.close();
+				
 				simulator.printInstructions();
+
+				// Now we try to read in commands 
+				Scanner inputScanner = new Scanner(System.in);
+				String command = inputScanner.nextLine();
+				while (command.charAt(0) != 'q') {
+					switch(command.charAt(0)) {
+					case 'h': 
+						System.out.println("Show help");
+						break;
+					case 'd':
+						System.out.println("Dump registers");
+						break;
+					case 's':
+						System.out.println("Single step");
+						break;
+					case 'r': 
+						System.out.println("Runs until program ends");
+						break;
+					case 'm':
+						System.out.println("Displays data memory from num1 to num2");
+						break;
+					case 'c':
+						System.out.println("Clear all registers, memory, and the program counter to 0");
+						break;
+					default:
+						System.out.println("Unknown command");
+						break;
+					}
+					command = inputScanner.nextLine();
+				}
 			}
 			catch (FileNotFoundException e) {
 				System.out.println("File not found!");
