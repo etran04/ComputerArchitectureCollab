@@ -11,75 +11,20 @@ import java.io.*;
 public class lab3 {
 
 	private Hashtable<String, Integer> labelsLocations;
-	private Hashtable<String, Integer> registers;
-	private Hashtable<String, Integer> opCodes;
-	private Hashtable<String, Integer> functions; 
 	private static String invalidOp = "";
 	
 	private ArrayList<Instruction> instructions;
+	private int pc;
 	private int[] dataMemory;
+	private int[] registers;
 	
 	/* Default constructor for our simulator */
 	public lab3() {
 		labelsLocations = new Hashtable<String, Integer>();
-		registers = new Hashtable<String, Integer>();
-		opCodes = new Hashtable<String, Integer>();
-		functions = new Hashtable<String, Integer>();
-		
 		instructions = new ArrayList<Instruction>();
 		dataMemory = new int[8192];
-		
-		registers.put("$zero", 0);
-		registers.put("$0", 0);
-		registers.put("$v0", 2);
-		registers.put("$v1", 3);
-		registers.put("$a0", 4);
-		registers.put("$a1", 5);
-		registers.put("$a2", 6);
-		registers.put("$a3", 7);
-		registers.put("$t0", 8);
-		registers.put("$t1", 9);
-		registers.put("$t2", 10);
-		registers.put("$t3", 11);
-		registers.put("$t4", 12);
-		registers.put("$t5", 13);
-		registers.put("$t6", 14);
-		registers.put("$t7", 15);
-		registers.put("$s0", 16);
-		registers.put("$s1", 17);
-		registers.put("$s2", 18);
-		registers.put("$s3", 19);		
-		registers.put("$s4", 20);
-		registers.put("$s5", 21);
-		registers.put("$s6", 22);
-		registers.put("$s7", 23);
-		registers.put("$t8", 24);
-		registers.put("$t9", 25);
-		registers.put("$sp", 29);
-		registers.put("$ra", 31);
-		
-		opCodes.put("and", 0);
-		opCodes.put("or", 0);
-		opCodes.put("add", 0);
-		opCodes.put("addi", 8);
-		opCodes.put("sll", 0);
-		opCodes.put("sub", 0);
-		opCodes.put("slt", 0);
-		opCodes.put("beq", 4);
-		opCodes.put("bne", 5);
-		opCodes.put("lw", 35);
-		opCodes.put("sw", 43);
-		opCodes.put("j", 2);
-		opCodes.put("jr", 0);
-		opCodes.put("jal", 3);
-		
-		functions.put("and", 36);
-		functions.put("or", 37);
-		functions.put("add", 32);
-		functions.put("sll", 0);
-		functions.put("sub", 34);
-		functions.put("slt", 42);
-		functions.put("jr", 8);
+		registers = new int[32];
+		pc = 0;
 	}
 	
 	/* Used for adding a label to a hashtable */
@@ -87,7 +32,7 @@ public class lab3 {
 		labelsLocations.put(label, lineNumber);
 	}
 	
-	/* Helper method for printint out list of instructions */
+	/* Helper method for printing out list of instructions */
 	void printInstructions() {
 		for (int i = 0; i < instructions.size(); i++) {
 			instructions.get(i).printSummary();
@@ -168,6 +113,27 @@ public class lab3 {
             throw new InvalidCommandException();
         }
 	}
+	
+	/* Used to clear all registers to 0 */
+	void dumpRegisters() {
+		this.pc = 0;
+		for (int i = 0; i < this.registers.length; i++) {
+			registers[i] = 0;
+		}
+	}
+	
+	/* Used for the 'h' command. Prints out the help */
+	void printHelp() {
+		System.out.println("\nh = show help");
+		System.out.println("d = dump register state");
+		System.out.println("s = single step through the program (i.e. execute 1 instruction and stop)");
+		System.out.println("s num = step through num instructions of the program");
+		System.out.println("r = run until the program ends");
+		System.out.println("m num1 num2 = display data memory from location num1 to num2");
+		System.out.println(	"c = clear all registers, memory, and the program counter to 0");
+		System.out.println(	"q = exit the program\n");
+	}
+	
 	/* Runs the simulator */
 	public static void main(String[] args) {
 		lab3 simulator = new lab3();
@@ -227,7 +193,7 @@ public class lab3 {
 				}
 				scanner.close();
 				
-				simulator.printInstructions();
+				//simulator.printInstructions();
 
 				// Now we try to read in commands 
 				Scanner inputScanner = new Scanner(System.in);
@@ -235,10 +201,11 @@ public class lab3 {
 				while (command.charAt(0) != 'q') {
 					switch(command.charAt(0)) {
 					case 'h': 
-						System.out.println("Show help");
+						simulator.printHelp();
 						break;
 					case 'd':
 						System.out.println("Dump registers");
+						simulator.dumpRegisters();
 						break;
 					case 's':
 						System.out.println("Single step");
