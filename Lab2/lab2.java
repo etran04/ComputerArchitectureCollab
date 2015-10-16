@@ -295,7 +295,7 @@ public class lab2 {
 				System.out.println("File not found!");
 			}
 			catch (InvalidCommandException e) {
-				System.out.println("invalid instruction: " + invalidOp);
+				System.out.println("invalid instruction: " + invalidOp + "\n");
 			}
 		}
     }

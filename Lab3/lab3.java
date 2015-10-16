@@ -145,12 +145,21 @@ public class lab3 {
             throw new InvalidCommandException();
         }
 	}
-	
-	/* Used to clear all this.registersToString to 0, and prints them*/
+
+	/* Used to reset program - clear all regs, mem, set PC to 0*/
+	void clear() {
+		for (int i = 0; i < this.registers.length; i++) {
+			registers[i] = 0;
+		}
+		dataMemory = new int[8192];
+		this.pc = 0;
+		System.out.println("\t Simulator Reset");
+	}
+
+	/* Used to print all register states*/
 	void dumpRegisters() {
 		System.out.println("\npc = " + this.pc);
 		for (int i = 0; i < this.registers.length; i++) {
-			registers[i] = 0;
 			if (i != 1 && i != 26 && i != 27 && i != 28 && i != 30){
 				if (i % 4 == 0 && i != 0) 
 					System.out.println(this.registersToString.get(i) + " = " + 0 + " \t");	
@@ -172,11 +181,16 @@ public class lab3 {
 		System.out.println(	"c = clear all this.registersToString, memory, and the program counter to 0");
 		System.out.println(	"q = exit the program\n");
 	}
+
+	/*Step method, steps through program instructions*/
+	void step(int step) {
+
+	}
 	
 	/* Runs the simulator */
 	public static void main(String[] args) {
 		lab3 simulator = new lab3();
-		
+		String[] stepArray;
 		Scanner scanner = new Scanner(System.in);
 		
 		if (args.length == 0) {
@@ -246,7 +260,20 @@ public class lab3 {
 						simulator.dumpRegisters();
 						break;
 					case 's':
-						System.out.println("Single step");
+						if( (stepArray = (command.split("\\s+"))).length == 2) {
+							try {
+								int stepNum = Integer.parseInt(stepArray[1]);
+								step(stepNum);
+							}
+							catch(NumberFormatException e) {
+								System.out.println("Invalid step count");
+							}
+							System.out.println("multi step");
+						}
+						else {
+							step(1);
+							System.out.println("single step");
+						}
 						break;
 					case 'r': 
 						System.out.println("Runs until program ends");
@@ -255,7 +282,7 @@ public class lab3 {
 						System.out.println("Displays data memory from num1 to num2");
 						break;
 					case 'c':
-						System.out.println("Clear all registers, memory, and the program counter to 0");
+						simulator.clear();
 						break;
 					default:
 						System.out.println("Unknown command");
