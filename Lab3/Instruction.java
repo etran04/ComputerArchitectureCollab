@@ -67,23 +67,23 @@ public class Instruction {
 		return opCode;
 	}
 
-	public String source1() {
+	public String getSource1() {
 		return source1;
 	}
 
-	public String source2() {
+	public String getSource2() {
 		return source2;
 	}
 
-	public String dest() {
+	public String getDest() {
 		return dest;
 	}
 
-	public int shift() {
+	public int getShift() {
 		return shift;
 	}
 
-	public int immediateNum() {
+	public int getImmediateNum() {
 		return immediateNum;
 	}
 

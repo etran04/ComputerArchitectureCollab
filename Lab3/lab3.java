@@ -231,39 +231,55 @@ public class lab3 {
     void executeInstructions(Instruction instr) {
         switch(instr.getOpcode()) {
             case "add":
-                registers[stringToRegister.get(instr.dest())] = registers[stringToRegister.get(instr.source1())] +
-                        registers[stringToRegister.get(instr.source2())];
+                registers[stringToRegister.get(instr.getDest())] =
+                        registers[stringToRegister.get(instr.getSource1())] +
+                        registers[stringToRegister.get(instr.getSource2())];
                 pc++;
                 break;
             case "addi":
                 System.out.println("addi");
-                registers[stringToRegister.get(instr.dest())] = registers[stringToRegister.get(instr.source1())] +
+                registers[stringToRegister.get(instr.getDest())] =
+                        registers[stringToRegister.get(instr.getSource1())] +
                         instr.immediateNum();
                 pc++;
                 break;
             case "sub":
                 System.out.println("sub");
-                registers[stringToRegister.get(instr.dest())] = registers[stringToRegister.get(instr.source1())] -
-                    registers[stringToRegister.get(instr.source2())];
+                registers[stringToRegister.get(instr.getDest())] =
+                        registers[stringToRegister.get(instr.getSource1())] -
+                        registers[stringToRegister.get(instr.getSource2())];
                 break;
             case "and":
                 System.out.println("and");
-                registers[stringToRegister.get(instr.dest())] = registers[stringToRegister.get(instr.source1())] &
-                        registers[stringToRegister.get(instr.source2())];
+                registers[stringToRegister.get(instr.getDest())] =
+                        registers[stringToRegister.get(instr.getSource1())] &
+                        registers[stringToRegister.get(instr.getSource2())];
                 break;
             case "or":
-                registers[stringToRegister.get(instr.dest())] = registers[stringToRegister.get(instr.source1())] |
-                        registers[stringToRegister.get(instr.source2())];
+                registers[stringToRegister.get(instr.getDest())] =
+                        registers[stringToRegister.get(instr.getSource1())] |
+                        registers[stringToRegister.get(instr.getSource2())];
                 System.out.println("or");
                 break;
             case "sll":
                 System.out.println("sll");
+                registers[stringToRegister.get(instr.getDest())] =
+                        registers[stringToRegister.get(instr.getSource1())] <<
+                        instr.getShift();
                 break;
             case "slt":
                 System.out.println("slt");
+                if(registers[stringToRegister.get(instr.getSource1())] <
+                   registers[stringToRegister.get(instr.getSource2())]) {
+                    registers[stringToRegister.get(instr.getDest())] = 1;
+                }
+                else {
+                    registers[stringToRegister.get(instr.getDest())] = 0;
+                }
                 break;
             case "beq":
                 System.out.println("beq");
+                
                 break;
             case "bne":
                 System.out.println("bne");
