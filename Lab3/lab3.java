@@ -243,11 +243,17 @@ public class lab3 {
                 break;
             case "sub":
                 System.out.println("sub");
+                registers[stringToRegister.get(instr.dest())] = registers[stringToRegister.get(instr.source1())] -
+                    registers[stringToRegister.get(instr.source2())];
                 break;
             case "and":
                 System.out.println("and");
+                registers[stringToRegister.get(instr.dest())] = registers[stringToRegister.get(instr.source1())] &
+                        registers[stringToRegister.get(instr.source2())];
                 break;
             case "or":
+                registers[stringToRegister.get(instr.dest())] = registers[stringToRegister.get(instr.source1())] |
+                        registers[stringToRegister.get(instr.source2())];
                 System.out.println("or");
                 break;
             case "sll":
