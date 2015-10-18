@@ -229,9 +229,11 @@ public class lab3 {
 
     /*Executes an instruction*/
     void executeInstructions(Instruction instr) {
+		System.out.println("PC: " + pc);
         if(pc != instructions.size()) {
             switch (instr.getOpcode()) {
                 case "add":
+					System.out.println("add");
                     registers[stringToRegister.get(instr.getDest())] =
                             registers[stringToRegister.get(instr.getSource1())] +
                                     registers[stringToRegister.get(instr.getSource2())];
@@ -285,7 +287,7 @@ public class lab3 {
                 case "beq":
                     System.out.println("beq");
                     if (registers[stringToRegister.get(instr.getSource1())] ==
-                            registers[stringToRegister.get(instr.getSource2())]) {
+                            registers[stringToRegister.get(instr.getDest())]) {
                         pc = labelsLocations.get(instr.getBranch());
                     } else {
                         pc++;
@@ -293,8 +295,9 @@ public class lab3 {
                     break;
                 case "bne":
                     System.out.println("bne");
+					//System.out.println("1: " + instr.getSource1() + " 2: " + instr.getDest() + "branch: " + instr.getBranch());
                     if (registers[stringToRegister.get(instr.getSource1())] !=
-                            registers[stringToRegister.get(instr.getSource2())]) {
+                            registers[stringToRegister.get(instr.getDest())]) {
                         pc = labelsLocations.get(instr.getBranch());
                     } else {
                         pc++;
@@ -311,15 +314,19 @@ public class lab3 {
                     dataMemory[instr.getOffset() + registers[stringToRegister.get(instr.getDest())]] =
                             registers[stringToRegister.get(instr.getSource1())];
                     pc++;
+					break;
                 case "j":
                     System.out.println("j");
                     pc = labelsLocations.get(instr.getBranch());
                     break;
                 case "jr":
                     System.out.println("jr");
+ 					pc = registers[stringToRegister.get("$ra")];
                     break;
                 case "jal":
                     System.out.println("jal");
+					registers[stringToRegister.get("$ra")] = pc + 1;
+					pc = labelsLocations.get(instr.getBranch());
                     break;
                 default:
                     System.out.println("No valid command found");
