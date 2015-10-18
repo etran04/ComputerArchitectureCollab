@@ -12,6 +12,7 @@ public class lab3 {
 
 	private Hashtable<String, Integer> labelsLocations;
 	private Hashtable<Integer, String> registersToString;
+    private Hashtable<String, Integer> stringToRegister;
 	private static String invalidOp = "";
 	
 	private ArrayList<Instruction> instructions;
@@ -24,6 +25,7 @@ public class lab3 {
 	public lab3() {
 		this.labelsLocations = new Hashtable<String, Integer>();
 		this.registersToString = new Hashtable<Integer, String>();
+        this.stringToRegister = new Hashtable<String, Integer>();
 		this.instructions = new ArrayList<Instruction>();
 		this.dataMemory = new int[8192];
 		this.registers = new int[32];
@@ -55,6 +57,34 @@ public class lab3 {
 		this.registersToString.put(25, "$t9");
 		this.registersToString.put(29, "$sp");
 		this.registersToString.put(31, "$ra");
+
+        this.stringToRegister.put("$0", 0);
+        this.stringToRegister.put("$v0", 1);
+        this.stringToRegister.put("$v1", 2);
+        this.stringToRegister.put("$a0", 4);
+        this.stringToRegister.put("$a1", 5);
+        this.stringToRegister.put("$a2", 6);
+        this.stringToRegister.put("$a3", 7);
+        this.stringToRegister.put("$t0", 8);
+        this.stringToRegister.put("$t1", 9);
+        this.stringToRegister.put("$t2", 10);
+        this.stringToRegister.put("$t3", 11);
+        this.stringToRegister.put("$t4", 12);
+        this.stringToRegister.put("$t5", 13);
+        this.stringToRegister.put("$t6", 14);
+        this.stringToRegister.put("$t7", 15);
+        this.stringToRegister.put("$s0", 16);
+        this.stringToRegister.put("$s1", 17);
+        this.stringToRegister.put("$s2", 18);
+        this.stringToRegister.put("$s3", 19);
+        this.stringToRegister.put("$s4", 20);
+        this.stringToRegister.put("$s5", 21);
+        this.stringToRegister.put("$s6", 22);
+        this.stringToRegister.put("$s7", 23);
+        this.stringToRegister.put("$t8", 24);
+        this.stringToRegister.put("$t9", 25);
+        this.stringToRegister.put("$sp", 29);
+        this.stringToRegister.put("$ra", 31);
 		
 		this.pc = 0;
 	}
@@ -161,10 +191,10 @@ public class lab3 {
 		System.out.println("\npc = " + this.pc);
 		for (int i = 0; i < this.registers.length; i++) {
 			if (i != 1 && i != 26 && i != 27 && i != 28 && i != 30){
-				if (i % 4 == 0 && i != 0) 
-					System.out.println(this.registersToString.get(i) + " = " + 0 + " \t");	
+				if (i % 4 == 0 && i != 0)
+                    System.out.println(this.registersToString.get(i) + " = " + registers[i] + " \t");
 				else 
-					System.out.print(this.registersToString.get(i) + " = " + 0 + " \t");
+					System.out.print(this.registersToString.get(i) + " = " + registers[i] + " \t");
 			}
 		}
 		System.out.println("\n");
@@ -184,8 +214,74 @@ public class lab3 {
 
 	/*Step method, steps through program instructions*/
 	void step(int step) {
-
+        if(pc < instructions.size()) {
+            for (int i = 0; i < step; i++) {
+                System.out.println("Executing instruction " + pc + "...");
+                Instruction instr = instructions.get(pc);
+                executeInstructions(instr);
+            }
+            System.out.println(step + " instruction(s) + executed");
+        }
+        else {
+            System.out.println("No instructions to execute");
+        }
 	}
+
+    /*Executes an instruction*/
+    void executeInstructions(Instruction instr) {
+        switch(instr.getOpcode()) {
+            case "add":
+                registers[stringToRegister.get(instr.dest())] = registers[stringToRegister.get(instr.source1())] +
+                        registers[stringToRegister.get(instr.source2())];
+                pc++;
+                break;
+            case "addi":
+                System.out.println("addi");
+                registers[stringToRegister.get(instr.dest())] = registers[stringToRegister.get(instr.source1())] +
+                        instr.immediateNum();
+                pc++;
+                break;
+            case "sub":
+                System.out.println("sub");
+                break;
+            case "and":
+                System.out.println("and");
+                break;
+            case "or":
+                System.out.println("or");
+                break;
+            case "sll":
+                System.out.println("sll");
+                break;
+            case "slt":
+                System.out.println("slt");
+                break;
+            case "beq":
+                System.out.println("beq");
+                break;
+            case "bne":
+                System.out.println("bne");
+                break;
+            case "lw":
+                System.out.println("lw");
+                break;
+            case "sw":
+                System.out.println("sw");
+                break;
+            case "j":
+                System.out.println("j");
+                break;
+            case "jr":
+                System.out.println("jr");
+                break;
+            case "jal":
+                System.out.println("jal");
+                break;
+            default:
+                System.out.println("No valid command found");
+                break;
+        }
+    }
 	
 	/* Runs the simulator */
 	public static void main(String[] args) {
@@ -230,7 +326,7 @@ public class lab3 {
 				// Second pass
 				scanner = new Scanner(asmFile);
 				while (scanner.hasNextLine()) {
-					currLine = scanner.nextLine().trim();
+                    currLine = scanner.nextLine().trim();
 					// Line is not blank, and doesn't start with a comment 
 					if (currLine.length() != 0 && currLine.charAt(0) != '#') {
 						// There is a label
@@ -263,7 +359,7 @@ public class lab3 {
 						if( (stepArray = (command.split("\\s+"))).length == 2) {
 							try {
 								int stepNum = Integer.parseInt(stepArray[1]);
-								step(stepNum);
+								simulator.step(stepNum);
 							}
 							catch(NumberFormatException e) {
 								System.out.println("Invalid step count");
@@ -271,7 +367,7 @@ public class lab3 {
 							System.out.println("multi step");
 						}
 						else {
-							step(1);
+							simulator.step(1);
 							System.out.println("single step");
 						}
 						break;

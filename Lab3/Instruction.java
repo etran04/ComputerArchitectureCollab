@@ -62,4 +62,32 @@ public class Instruction {
 		System.out.println("ImmediateNum: " + this.immediateNum);
 		System.out.println("Offset: " + this.offSet);
 	}
+
+	public String getOpcode() {
+		return opCode;
+	}
+
+	public String source1() {
+		return source1;
+	}
+
+	public String source2() {
+		return source2;
+	}
+
+	public String dest() {
+		return dest;
+	}
+
+	public int shift() {
+		return shift;
+	}
+
+	public int immediateNum() {
+		return immediateNum;
+	}
+
+	public int offset() {
+		return offSet;
+	}
 }
