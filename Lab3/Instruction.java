@@ -79,6 +79,10 @@ public class Instruction {
 		return dest;
 	}
 
+	public String getBranch() {
+		return branch;
+	}
+
 	public int getShift() {
 		return shift;
 	}
@@ -87,7 +91,7 @@ public class Instruction {
 		return immediateNum;
 	}
 
-	public int offset() {
+	public int getOffset() {
 		return offSet;
 	}
 }

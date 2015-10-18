@@ -151,7 +151,7 @@ public class lab3 {
 			param3 = param2.substring(param2.indexOf("$"), param2.indexOf("$") + 3);
 			param2 = param2.substring(0, param2.indexOf('$') - 1);
 			
-			instructions.add(new Instruction(opCode, param3, param2, param1, false));
+			instructions.add(new Instruction(opCode, param1, param2, param3, false));
 		}
 		else if (opCode.equals("j") || opCode.equals("jr") || opCode.equals("jal")) {
 			// Single argument after op code
@@ -229,79 +229,102 @@ public class lab3 {
 
     /*Executes an instruction*/
     void executeInstructions(Instruction instr) {
-        switch(instr.getOpcode()) {
-            case "add":
-                registers[stringToRegister.get(instr.getDest())] =
-                        registers[stringToRegister.get(instr.getSource1())] +
-                        registers[stringToRegister.get(instr.getSource2())];
-                pc++;
-                break;
-            case "addi":
-                System.out.println("addi");
-                registers[stringToRegister.get(instr.getDest())] =
-                        registers[stringToRegister.get(instr.getSource1())] +
-                        instr.immediateNum();
-                pc++;
-                break;
-            case "sub":
-                System.out.println("sub");
-                registers[stringToRegister.get(instr.getDest())] =
-                        registers[stringToRegister.get(instr.getSource1())] -
-                        registers[stringToRegister.get(instr.getSource2())];
-                break;
-            case "and":
-                System.out.println("and");
-                registers[stringToRegister.get(instr.getDest())] =
-                        registers[stringToRegister.get(instr.getSource1())] &
-                        registers[stringToRegister.get(instr.getSource2())];
-                break;
-            case "or":
-                registers[stringToRegister.get(instr.getDest())] =
-                        registers[stringToRegister.get(instr.getSource1())] |
-                        registers[stringToRegister.get(instr.getSource2())];
-                System.out.println("or");
-                break;
-            case "sll":
-                System.out.println("sll");
-                registers[stringToRegister.get(instr.getDest())] =
-                        registers[stringToRegister.get(instr.getSource1())] <<
-                        instr.getShift();
-                break;
-            case "slt":
-                System.out.println("slt");
-                if(registers[stringToRegister.get(instr.getSource1())] <
-                   registers[stringToRegister.get(instr.getSource2())]) {
-                    registers[stringToRegister.get(instr.getDest())] = 1;
-                }
-                else {
-                    registers[stringToRegister.get(instr.getDest())] = 0;
-                }
-                break;
-            case "beq":
-                System.out.println("beq");
-                
-                break;
-            case "bne":
-                System.out.println("bne");
-                break;
-            case "lw":
-                System.out.println("lw");
-                break;
-            case "sw":
-                System.out.println("sw");
-                break;
-            case "j":
-                System.out.println("j");
-                break;
-            case "jr":
-                System.out.println("jr");
-                break;
-            case "jal":
-                System.out.println("jal");
-                break;
-            default:
-                System.out.println("No valid command found");
-                break;
+        if(pc != instructions.size()) {
+            switch (instr.getOpcode()) {
+                case "add":
+                    registers[stringToRegister.get(instr.getDest())] =
+                            registers[stringToRegister.get(instr.getSource1())] +
+                                    registers[stringToRegister.get(instr.getSource2())];
+                    pc++;
+                    break;
+                case "addi":
+                    System.out.println("addi");
+                    registers[stringToRegister.get(instr.getDest())] =
+                            registers[stringToRegister.get(instr.getSource1())] +
+                                    instr.getImmediateNum();
+                    pc++;
+                    break;
+                case "sub":
+                    System.out.println("sub");
+                    registers[stringToRegister.get(instr.getDest())] =
+                            registers[stringToRegister.get(instr.getSource1())] -
+                                    registers[stringToRegister.get(instr.getSource2())];
+                    pc++;
+                    break;
+                case "and":
+                    System.out.println("and");
+                    registers[stringToRegister.get(instr.getDest())] =
+                            registers[stringToRegister.get(instr.getSource1())] &
+                                    registers[stringToRegister.get(instr.getSource2())];
+                    pc++;
+                    break;
+                case "or":
+                    System.out.println("or");
+                    registers[stringToRegister.get(instr.getDest())] =
+                            registers[stringToRegister.get(instr.getSource1())] |
+                                    registers[stringToRegister.get(instr.getSource2())];
+                    pc++;
+                    break;
+                case "sll":
+                    System.out.println("sll");
+                    registers[stringToRegister.get(instr.getDest())] =
+                            registers[stringToRegister.get(instr.getSource1())] <<
+                                    instr.getShift();
+                    pc++;
+                    break;
+                case "slt":
+                    System.out.println("slt");
+                    if (registers[stringToRegister.get(instr.getSource1())] <
+                            registers[stringToRegister.get(instr.getSource2())]) {
+                        registers[stringToRegister.get(instr.getDest())] = 1;
+                    } else {
+                        registers[stringToRegister.get(instr.getDest())] = 0;
+                    }
+                    pc++;
+                    break;
+                case "beq":
+                    System.out.println("beq");
+                    if (registers[stringToRegister.get(instr.getSource1())] ==
+                            registers[stringToRegister.get(instr.getSource2())]) {
+                        pc = labelsLocations.get(instr.getBranch());
+                    } else {
+                        pc++;
+                    }
+                    break;
+                case "bne":
+                    System.out.println("bne");
+                    if (registers[stringToRegister.get(instr.getSource1())] !=
+                            registers[stringToRegister.get(instr.getSource2())]) {
+                        pc = labelsLocations.get(instr.getBranch());
+                    } else {
+                        pc++;
+                    }
+                    break;
+                case "lw":
+                    System.out.println("lw");
+                    registers[stringToRegister.get(instr.getDest())] =
+                            dataMemory[registers[stringToRegister.get(instr.getSource1()) + instr.getOffset()]];
+                    pc++;
+                    break;
+                case "sw":
+                    System.out.println("sw");
+                    dataMemory[instr.getOffset() + registers[stringToRegister.get(instr.getDest())]] =
+                            registers[stringToRegister.get(instr.getSource1())];
+                    pc++;
+                case "j":
+                    System.out.println("j");
+                    pc = labelsLocations.get(instr.getBranch());
+                    break;
+                case "jr":
+                    System.out.println("jr");
+                    break;
+                case "jal":
+                    System.out.println("jal");
+                    break;
+                default:
+                    System.out.println("No valid command found");
+                    break;
+            }
         }
     }
 	
@@ -310,6 +333,7 @@ public class lab3 {
 		lab3 simulator = new lab3();
 		String[] stepArray;
 		Scanner scanner = new Scanner(System.in);
+        int num_inst = 0;
 		
 		if (args.length == 0) {
 			System.out.println("usage: java lab3 [.asm file] [optional script file]");
@@ -330,7 +354,7 @@ public class lab3 {
 						if (currLine.contains(":")) {
 							StringTokenizer tokens = new StringTokenizer(currLine, ":");
 							String label = tokens.nextToken();
-							if(tokens.hasMoreTokens()) 
+							if(tokens.hasMoreTokens())
 								simulator.addLabel(label, lineNumber++);
 							else 
 								nextLabel = label;
@@ -339,8 +363,9 @@ public class lab3 {
 	                        simulator.addLabel(nextLabel, lineNumber++);
 	                        nextLabel = "";
 	                    }
-	                    else 
-	                        lineNumber++;
+	                    else {
+                            lineNumber++;
+                        }
 					}
 				}
 				
