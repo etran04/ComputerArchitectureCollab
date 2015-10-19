@@ -209,7 +209,7 @@ public class lab3 {
 		System.out.println("s num = step through num instructions of the program");
 		System.out.println("r = run until the program ends");
 		System.out.println("m num1 num2 = display data memory from location num1 to num2");
-		System.out.println(	"c = clear all this.registersToString, memory, and the program counter to 0");
+		System.out.println(	"c = clear all registers, memory, and the program counter to 0");
 		System.out.println(	"q = exit the program\n");
 	}
 
@@ -452,6 +452,12 @@ public class lab3 {
 					case 'm':
                         int start_mem = Integer.parseInt(inputs[1]);
                         int end_mem = Integer.parseInt(inputs[2]);
+                        if (!interact) {
+                        	System.out.print(" " + start_mem + " " + end_mem + "\n");
+                        }
+                        else {
+                        	System.out.println();
+                        }
                         simulator.showMemory(start_mem, end_mem);
 						break;
 					case 'c':
