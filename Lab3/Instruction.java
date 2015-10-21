@@ -1,3 +1,8 @@
+/*
+ * @authors: Eric Tran & Jordan Tang
+ * CSC 315 - Lab 3
+ * Professor Seng
+ */
 
 public class Instruction {
 	private String opCode;
