@@ -8,3 +8,6 @@
 
 ## Lab3
 [Link to Lab3 specs](http://users.csc.calpoly.edu/~jseng/Fall15/lab3/Lab3.html)
+
+## Lab4
+[Link to Lab4 specs](http://users.csc.calpoly.edu/~jseng/Fall15/lab4/Lab4.html)
