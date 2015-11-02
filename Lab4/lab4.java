@@ -10,7 +10,7 @@ import java.util.*;
 import java.io.*;
 import java.text.DecimalFormat;
 
-public class lab3 {
+public class lab4 {
 
 	private Hashtable<String, Integer> labelsLocations;
 	private Hashtable<Integer, String> registersToString;
@@ -28,7 +28,7 @@ public class lab3 {
 	
 	
 	/* Default constructor for our simulator */
-	public lab3() {
+	public lab4() {
 		this.labelsLocations = new Hashtable<String, Integer>();
 		this.registersToString = new Hashtable<Integer, String>();
         this.stringToRegister = new Hashtable<String, Integer>();
