@@ -5,7 +5,6 @@
  * Lab2
  */
 
-import javax.sound.midi.SysexMessage;
 import java.util.*;
 import java.io.*;
 import java.text.DecimalFormat;
@@ -25,6 +24,11 @@ public class lab4 {
 	
 	// cpu simulation
 	private String[] pipeline;
+	
+	// beq logic 
+	private boolean branchTaken;
+	private int branchCounter; 
+	private int oldPC; 
 	
 	
 	/* Default constructor for our simulator */
@@ -99,6 +103,8 @@ public class lab4 {
 		
 		this.pc = 0;
 		this.cycles = 0;
+		this.branchTaken = false; 
+		this.branchCounter = 0;
 	}
 	
 	/* Used for adding a label to a hashtable */
@@ -222,6 +228,7 @@ public class lab4 {
 	void printHelp() {
 		System.out.println("\nh = show help");
 		System.out.println("d = dump register state");
+		System.out.println("p = show pipeline registers");
 		System.out.println("s = single step through the program (i.e. execute 1 instruction and stop)");
 		System.out.println("s num = step through num instructions of the program");
 		System.out.println("r = run until the program ends");
@@ -245,9 +252,22 @@ public class lab4 {
         if(pc < instructions.size()) {
             for (int i = 0; i < step; i++) {
                 //checks that there are still instructions to execute
-                if(pc != instructions.size()) {
+                if(pc != instructions.size() && !this.branchTaken) {
                     Instruction instr = instructions.get(pc);
-                    executeInstructions(instr, runCommand);
+                    this.oldPC = this.pc;
+                    
+                  	executeInstructions(instr, runCommand);
+                }
+                else if(this.branchTaken){
+                	if (--this.branchCounter > 0) {
+                		this.shiftPipeline(this.instructions.get(this.oldPC++).getOpcode());
+                	} else {
+                		for (int j = 0; j < 3; j++) {
+                			this.pipeline[j] = "squash";
+                		}
+                		this.branchTaken = false; 
+                	}
+            		this.showPipeline();
                 }
                 else {
                     System.out.println("No more instructions to step through");
@@ -313,7 +333,10 @@ public class lab4 {
             case "beq":
                 if (registers[stringToRegister.get(instr.getSource1())] ==
                         registers[stringToRegister.get(instr.getDest())]) {
-                    pc = labelsLocations.get(instr.getBranch());
+                	System.out.println("set branch true");
+                	this.branchTaken = true;
+                	this.branchCounter = 3;
+                	pc = labelsLocations.get(instr.getBranch());      	
                 } else {
                     pc++;
                 }
@@ -321,6 +344,8 @@ public class lab4 {
             case "bne":
                 if (registers[stringToRegister.get(instr.getSource1())] !=
                         registers[stringToRegister.get(instr.getDest())]) {
+                	this.branchTaken = true;
+                	this.branchCounter = 3;
                     pc = labelsLocations.get(instr.getBranch());
                 } else {
                     pc++;
@@ -389,13 +414,13 @@ public class lab4 {
 
     /* Runs the simulator */
 	public static void main(String[] args) {
-		lab3 simulator = new lab3();
+		lab4 simulator = new lab4();
 		String[] stepArray;
 		Scanner scanner = new Scanner(System.in);
         int num_inst = 0;
 		
 		if (args.length == 0) {
-			System.out.println("usage: java lab3 [.asm file] [optional script file]");
+			System.out.println("usage: java lab4 [.asm file] [optional script file]");
 		}
 		// Load according files
 		else {
