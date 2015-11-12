@@ -270,6 +270,7 @@ public class lab4 {
                     	this.jumpTaken = false;
                     	this.shiftPipeline("squash");
                     	this.pc = this.newPC;
+                    	//this.cycles--;
                     } 
                     else if (this.branchTaken) {
                     	if (this.branchCounter == 1) {
@@ -284,6 +285,7 @@ public class lab4 {
                     		this.shiftPipeline(instructions.get(pc).getOpcode());
                     		this.pc++;
                     	}
+                    	//this.cycles--;
                     }
                     else if(useAfterLoadStall && stallCounter == 0) {
                     	useAfterLoadStall = false;
@@ -294,6 +296,7 @@ public class lab4 {
                     else {
                     	if(useAfterLoadStall && stallCounter == 1) {
                     		stallCounter--;
+                    		//this.cycles--;
                     	}
                     	Instruction instr = instructions.get(pc);                    
                     	executeInstructions(instr, runCommand);
