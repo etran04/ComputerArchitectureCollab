@@ -22,13 +22,15 @@ public class lab4 {
 	private int[] dataMemory;
 	private int[] registers;
 	
-	// cpu simulation
+	// pipeline logic
 	private String[] pipeline;
-	
-	// beq logic 
 	private boolean branchTaken;
 	private int branchCounter; 
-	private int oldPC; 
+	private int newPC; 
+	private boolean jumpTaken;
+	private int instructionsExecuted; 
+	private boolean useAfterLoadStall;
+	private int stallCounter;
 	
 	
 	/* Default constructor for our simulator */
@@ -103,17 +105,21 @@ public class lab4 {
 		
 		this.pc = 0;
 		this.cycles = 0;
-		this.branchTaken = false; 
 		this.branchCounter = 0;
+		this.instructionsExecuted = 0;
+		this.branchTaken = false; 
+		this.jumpTaken = false; 
+		this.useAfterLoadStall = false;
+		this.stallCounter = 0;
 	}
 	
 	/* Used for adding a label to a hashtable */
-	void addLabel(String label, int lineNumber) {
+	private void addLabel(String label, int lineNumber) {
 		labelsLocations.put(label, lineNumber);
 	}
 	
 	/* Helper method for printing out list of instructions */
-	void printInstructions() {
+	private void printInstructions() {
 		for (int i = 0; i < instructions.size(); i++) {
 			instructions.get(i).printSummary();
 		}
@@ -121,7 +127,7 @@ public class lab4 {
 	}
 	
 	/* Used for parsing a simple instruction */
-	void parseSimpleInstructions(String currentLine, int lineNumber) throws InvalidCommandException{
+	private void parseSimpleInstructions(String currentLine, int lineNumber) throws InvalidCommandException{
 		StringTokenizer tokens = new StringTokenizer(currentLine, ",");
 		String[] temp = tokens.nextToken().trim().split("\\s+");
 		String opCode = temp[0].trim();
@@ -184,7 +190,7 @@ public class lab4 {
 	}
 	
 	/* Used for parsing instructions with a label on the same line */
-	void parseInstructionWithLabel(String currentLine, int lineNumber) throws InvalidCommandException {
+	private void parseInstructionWithLabel(String currentLine, int lineNumber) throws InvalidCommandException {
 		currentLine = currentLine.substring(currentLine.indexOf(':') + 1).trim();
         try {
             this.parseSimpleInstructions(currentLine, lineNumber);
@@ -195,7 +201,7 @@ public class lab4 {
 	}
 
 	/* Used to reset program - clear all regs, mem, set PC to 0*/
-	void clear() {
+	private void clear() {
 		for (int i = 0; i < this.registers.length; i++) {
 			this.registers[i] = 0;
 		}
@@ -207,11 +213,17 @@ public class lab4 {
 		this.dataMemory = new int[8192];
 		this.pc = 0;
 		this.cycles = 0;
+		this.instructionsExecuted = 0;
+		this.branchCounter = 0;
+		this.branchTaken = false;
+		this.jumpTaken = false;
+		this.useAfterLoadStall = false;
+		this.stallCounter = 0;
 		System.out.println("\n\t Simulator reset");
 	}
 
 	/* Used to print all register states*/
-	void dumpRegisters() {
+	private void dumpRegisters() {
 		System.out.println("\npc = " + this.pc);
 		for (int i = 0; i < this.registers.length; i++) {
 			if (i != 1 && i != 26 && i != 27 && i != 28 && i != 30){
@@ -225,7 +237,7 @@ public class lab4 {
 	}
 	
 	/* Used for the 'h' command. Prints out the help */
-	void printHelp() {
+	private void printHelp() {
 		System.out.println("\nh = show help");
 		System.out.println("d = dump register state");
 		System.out.println("p = show pipeline registers");
@@ -237,37 +249,61 @@ public class lab4 {
 		System.out.println("q = exit the program\n");
 	}
 
-    void runProgram() {
+    private void runProgram() {
         while(pc != instructions.size()) {
             step(1, true);
         }
         
         DecimalFormat f = new DecimalFormat("##.00");
         System.out.println("\nProgram complete");
-        System.out.println("CPI = " + f.format((double)this.cycles/this.instructions.size()) + "\tCycles = " + this.cycles + " Instructions = " + this.instructions.size());
+        System.out.println("CPI = " + f.format((double)this.cycles/this.instructionsExecuted) + "\tCycles = " + this.cycles + " Instructions = " + this.instructionsExecuted);
     }
 
 	/*Step method, steps through program instructions*/
-	void step(int step, boolean runCommand) {
-        if(pc < instructions.size()) {
+	private void step(int step, boolean runCommand) {
+		if (pc < instructions.size()) {
             for (int i = 0; i < step; i++) {
                 //checks that there are still instructions to execute
-                if(pc != instructions.size() && !this.branchTaken) {
-                    Instruction instr = instructions.get(pc);
-                    this.oldPC = this.pc;
-                    
-                  	executeInstructions(instr, runCommand);
-                }
-                else if(this.branchTaken){
-                	if (--this.branchCounter > 0) {
-                		this.shiftPipeline(this.instructions.get(this.oldPC++).getOpcode());
-                	} else {
-                		for (int j = 0; j < 3; j++) {
-                			this.pipeline[j] = "squash";
-                		}
-                		this.branchTaken = false; 
-                	}
-            		this.showPipeline();
+                if(pc != instructions.size()) {
+                    if (this.jumpTaken) {
+                    	this.jumpTaken = false;
+                    	this.shiftPipeline("squash");
+                    	this.pc = this.newPC;
+                    } 
+                    else if (this.branchTaken) {
+                    	if (this.branchCounter == 1) {
+                    		this.branchTaken = false; 
+                    		this.pc = this.newPC;
+                    		this.shiftPipeline("");
+                    		for (int j = 0; j < 3; j++) {
+                    			this.pipeline[j] = "squash";
+                    		}
+                    	} else {
+                    		this.branchCounter--; 
+                    		this.shiftPipeline(instructions.get(pc).getOpcode());
+                    		this.pc++;
+                    	}
+                    }
+                    else if(useAfterLoadStall && stallCounter == 0) {
+                    	useAfterLoadStall = false;
+                    	this.shiftPipeline("");
+                    	this.pipeline[0] = this.pipeline[1];
+                    	this.pipeline[1] = "stall";
+                    	cycles++;
+                    }
+                    else {
+                    	if(useAfterLoadStall && stallCounter == 1) {
+                    		stallCounter--;
+                    	}
+                    	Instruction instr = instructions.get(pc);                    
+                    	executeInstructions(instr, runCommand);
+                    }
+                    if (!runCommand) {
+                    	this.showPipeline();
+                    }
+            		if (pc == instructions.size()) {
+            			this.flushPipeline();
+            		}
                 }
                 else {
                     System.out.println("No more instructions to step through");
@@ -283,7 +319,8 @@ public class lab4 {
 	}
 
     /*Executes an instruction*/
-    void executeInstructions(Instruction instr, boolean runCommand) {
+    private void executeInstructions(Instruction instr, boolean runCommand) {
+    	this.instructionsExecuted++;
         switch (instr.getOpcode()) {
             case "add":
                 registers[stringToRegister.get(instr.getDest())] =
@@ -333,27 +370,41 @@ public class lab4 {
             case "beq":
                 if (registers[stringToRegister.get(instr.getSource1())] ==
                         registers[stringToRegister.get(instr.getDest())]) {
-                	System.out.println("set branch true");
                 	this.branchTaken = true;
                 	this.branchCounter = 3;
-                	pc = labelsLocations.get(instr.getBranch());      	
-                } else {
-                    pc++;
+                	this.newPC = labelsLocations.get(instr.getBranch());      
                 }
+                pc++;
                 break;
             case "bne":
                 if (registers[stringToRegister.get(instr.getSource1())] !=
                         registers[stringToRegister.get(instr.getDest())]) {
                 	this.branchTaken = true;
                 	this.branchCounter = 3;
-                    pc = labelsLocations.get(instr.getBranch());
-                } else {
-                    pc++;
+                	this.newPC = labelsLocations.get(instr.getBranch());      
                 }
+                pc++;
                 break;
             case "lw":
                 registers[stringToRegister.get(instr.getSource1())] =
                         dataMemory[registers[stringToRegister.get(instr.getDest())]  + instr.getOffset()];
+                
+                Instruction nextInstruction = instructions.get(pc+1);
+                if (nextInstruction.getSource1() != null) {
+                	String reg1 = nextInstruction.getSource1();
+                	if(reg1.equals(instr.getDest())) {
+                		useAfterLoadStall = true;
+                		stallCounter = 1;
+                	}
+                	if(nextInstruction.getSource2() != null) {
+                		String reg2 = nextInstruction.getSource2();
+                		if(reg2.equals(instr.getDest())) {
+                			useAfterLoadStall = true;
+                			stallCounter = 1;
+                		}
+                	}
+                }
+                
                 pc++;
                 break;
             case "sw":
@@ -362,37 +413,43 @@ public class lab4 {
                 pc++;
                 break;
             case "j":
-                pc = labelsLocations.get(instr.getBranch());
+            	this.jumpTaken = true;
+            	this.newPC = labelsLocations.get(instr.getBranch());
+                pc++;
                 break;
             case "jr":
-                pc = registers[stringToRegister.get("$ra")];
+            	this.jumpTaken = true;
+            	this.newPC = registers[stringToRegister.get("$ra")];
+                pc++;
                 break;
             case "jal":
+            	this.jumpTaken = true;
                 registers[stringToRegister.get("$ra")] = pc + 1;
-                pc = labelsLocations.get(instr.getBranch());
+                this.newPC = labelsLocations.get(instr.getBranch());
+                pc++;
                 break;
             default:
                 System.out.println("No valid command found");
                 break;
         }
-        
         this.shiftPipeline(instr.getOpcode());
-        if (!runCommand) {
-        	this.showPipeline();
-        }
     }
 
-    void shiftPipeline(String opcode) {
-    	if (!this.pipeline[3].equals("empty")) {
-    		this.cycles++;
-    	}
+    private void shiftPipeline(String opcode) {
+    	this.cycles++;
     	for (int i = 3; i > 0; i--) {
     		this.pipeline[i] = this.pipeline[i-1];
     	}
     	this.pipeline[0] = opcode; 
     }
     
-    void showMemory(int start, int end) {
+    private void flushPipeline() {
+    	for (int i = 0; i <= 3 ; i++) {
+    		this.shiftPipeline("empty");
+    	}
+    }
+    
+    private void showMemory(int start, int end) {
         if(start >= 0 && end < 8192) {
             for (int i = start; i <= end; i++) {
                 System.out.println("[" + i + "] = " + dataMemory[i]);
@@ -403,7 +460,7 @@ public class lab4 {
         }
     }
     
-    void showPipeline() {
+    private void showPipeline() {
     	System.out.println("pc\tif/id\tid/exe\texe/mem\tmem/wb");
     	System.out.print(this.pc + "\t");
     	for (int i = 0; i < 4; i++) {

@@ -1,6 +1,6 @@
 /*
  * @authors: Eric Tran & Jordan Tang
- * CSC 315 - Lab 3
+ * CSC 315 - Lab 4
  * Professor Seng
  */
 
@@ -46,6 +46,7 @@ public class Instruction {
 	public Instruction(String opCode, String source1, String dest, String shift) {
 		this.opCode = opCode;
 		this.source1 = source1;
+		this.source2 = null;
 		this.dest = dest;		
 		this.shift = Integer.parseInt(shift);
 	}
@@ -53,6 +54,8 @@ public class Instruction {
 	public Instruction(String opCode, String branch) {
 		this.opCode = opCode;
 		this.branch = branch;
+		this.source1 = null;
+		this.source2 = null;
 	}
 	
 	public void printSummary() {

@@ -1,13 +1,16 @@
 make
-java lab4 sum_10.asm sum_10.script > sum.mine
-echo "Diffing sum..."
-diff -B -w sum.mine sum_10.output 
-java lab4 lab3_fib.asm lab3_fib.script > fib.mine
-echo "Diffing fib..."
-diff -B -w fib.mine lab3_fib.output
-echo "Diffing test3..."
-java lab4 lab3_test3.asm lab3_test3.script > test3.mine
-diff -B -w test3.mine lab3_test3.output
+java lab4 lab4_test1.asm lab4_test1.script > test1.mine
+echo "Diffing test1..."
+diff -B -w test1.mine lab4_test1.output 
+
+java lab4 lab4_test2.asm lab4_test2.script > test2.mine
+echo "Diffing test2..."
+diff -B -w test2.mine lab4_test2.output 
+
+java lab4 lab4_.asm lab4_test1.script > test1.mine
+echo "Diffing test1..."
+diff -B -w test1.mine lab4_test1.output 
+
 echo "Finished testing..."
 echo "Removing files..."
 rm *.mine
