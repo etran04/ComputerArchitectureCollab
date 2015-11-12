@@ -254,9 +254,10 @@ public class lab4 {
             step(1, true);
         }
         
-        DecimalFormat f = new DecimalFormat("##.00");
-        System.out.println("\nProgram complete");
-        System.out.println("CPI = " + f.format((double)this.cycles/this.instructionsExecuted) + "\tCycles = " + this.cycles + " Instructions = " + this.instructionsExecuted);
+        DecimalFormat f = new DecimalFormat("##.000");
+        System.out.println("\n\nProgram complete");
+        System.out.println("CPI = " + f.format((double)this.cycles/this.instructionsExecuted) + 
+        		"\tCycles = " + this.cycles + " Instructions = " + this.instructionsExecuted);
     }
 
 	/*Step method, steps through program instructions*/
@@ -289,7 +290,6 @@ public class lab4 {
                     	this.shiftPipeline("");
                     	this.pipeline[0] = this.pipeline[1];
                     	this.pipeline[1] = "stall";
-                    	cycles++;
                     }
                     else {
                     	if(useAfterLoadStall && stallCounter == 1) {
@@ -309,9 +309,6 @@ public class lab4 {
                     System.out.println("No more instructions to step through");
                 }
             }
-//            if (!runCommand) {
-//            	System.out.println("\n" + step + " instruction(s) executed");
-//            }
         }
         else {
             System.out.println("No instructions to execute");
@@ -461,7 +458,7 @@ public class lab4 {
     }
     
     private void showPipeline() {
-    	System.out.println("pc\tif/id\tid/exe\texe/mem\tmem/wb");
+    	System.out.println("\n\npc\tif/id\tid/exe\texe/mem\tmem/wb");
     	System.out.print(this.pc + "\t");
     	for (int i = 0; i < 4; i++) {
     		System.out.print(this.pipeline[i] + "\t");
@@ -474,7 +471,6 @@ public class lab4 {
 		lab4 simulator = new lab4();
 		String[] stepArray;
 		Scanner scanner = new Scanner(System.in);
-        int num_inst = 0;
 		
 		if (args.length == 0) {
 			System.out.println("usage: java lab4 [.asm file] [optional script file]");
