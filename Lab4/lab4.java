@@ -1,8 +1,7 @@
-/* 
+/*
  * @authors: Jordan Tang & Eric Tran
- * CSC 315
+ * CSC 315 - Lab 4
  * Professor Seng
- * Lab2
  */
 
 import java.util.*;
