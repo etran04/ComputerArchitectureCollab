@@ -392,18 +392,18 @@ public class lab4 {
                 Instruction nextInstruction = instructions.get(pc+1);
                 if (nextInstruction.getSource1() != null) {
                 	String reg1 = nextInstruction.getSource1();
-                	if(reg1.equals(instr.getDest())) {
+                	if(reg1.equals(instr.getSource1())) {
                 		useAfterLoadStall = true;
                 		stallCounter = 1;
                 	}
-                	if(nextInstruction.getSource2() != null) {
-                		String reg2 = nextInstruction.getSource2();
-                		if(reg2.equals(instr.getDest())) {
-                			useAfterLoadStall = true;
-                			stallCounter = 1;
-                		}
-                	}
                 }
+                if(nextInstruction.getSource2() != null) {
+            		String reg2 = nextInstruction.getSource2();
+            		if(reg2.equals(instr.getSource1())) {
+            			useAfterLoadStall = true;
+            			stallCounter = 1;
+            		}
+            	}
                 
                 pc++;
                 break;
@@ -466,9 +466,11 @@ public class lab4 {
     	for (int i = 0; i < 4; i++) {
     		System.out.print(this.pipeline[i] + "\t");
     	}
+    	System.out.println("Cycles: " + this.cycles);
+
     	System.out.println();
     }
-
+    
     /* Runs the simulator */
 	public static void main(String[] args) {
 		lab4 simulator = new lab4();
