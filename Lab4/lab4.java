@@ -466,8 +466,6 @@ public class lab4 {
     	for (int i = 0; i < 4; i++) {
     		System.out.print(this.pipeline[i] + "\t");
     	}
-    	System.out.println("Cycles: " + this.cycles);
-
     	System.out.println();
     }
     
