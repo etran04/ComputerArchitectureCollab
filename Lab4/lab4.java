@@ -276,6 +276,7 @@ public class lab4 {
                     		this.branchTaken = false; 
                     		this.pc = this.newPC;
                     		this.shiftPipeline("");
+                    		this.cycles--;
                     		for (int j = 0; j < 3; j++) {
                     			this.pipeline[j] = "squash";
                     			this.cycles++;
