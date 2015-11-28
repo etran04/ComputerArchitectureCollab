@@ -11,3 +11,6 @@
 
 ## Lab4
 [Link to Lab4 specs](http://users.csc.calpoly.edu/~jseng/Fall15/lab4/Lab4.html)
+
+## Lab5
+[Link to Lab5 specs](http://users.csc.calpoly.edu/~jseng/Fall15/lab5/Lab5.html)
