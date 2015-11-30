@@ -304,6 +304,7 @@ public class lab5 {
 							stallCounter--;
 						}
 						Instruction instr = instructions.get(pc);
+						instr.printSummary();
 						executeInstructions(instr, runCommand);
 					}
 					if (!runCommand) {
