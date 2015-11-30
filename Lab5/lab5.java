@@ -378,7 +378,6 @@ public class lab5 {
 				this.branchTaken = true;
 				this.branchCounter = 3;
 				this.newPC = labelsLocations.get(instr.getBranch());
-				shiftGHR(1);
 				int ndx = getPredictionNdx();
 				int predictionNum = predictors[ndx];
 				if(predictionNum == 2 || predictionNum == 3) {
@@ -387,9 +386,9 @@ public class lab5 {
 				if(predictionNum == 0 || predictionNum == 1 || predictionNum == 2) {
 					predictors[ndx]++;
 				}
+				shiftGHR(1);
 			}
 			else {
-				shiftGHR(0);
 				int ndx = getPredictionNdx();
 				int predictionNum = predictors[ndx];
 				if(predictionNum == 0 || predictionNum == 1) {
@@ -398,6 +397,7 @@ public class lab5 {
 				if(predictionNum == 3 || predictionNum == 1 || predictionNum == 2) {
 					predictors[ndx]--;
 				}
+				shiftGHR(0);
 			}
 			totalPredictions++;
 			pc++;
@@ -408,26 +408,26 @@ public class lab5 {
 				this.branchTaken = true;
 				this.branchCounter = 3;
 				this.newPC = labelsLocations.get(instr.getBranch());
-				shiftGHR(1);
 				int ndx = getPredictionNdx();
 				int predictionNum = predictors[ndx];
-				if(predictionNum == 2 || predictionNum == 3) {
+				if(predictionNum > 1) {
 					correctPredictions++;
 				}
-				if(predictionNum == 0 || predictionNum == 1 || predictionNum == 2) {
+				if(predictionNum < 3) {
 					predictors[ndx]++;
 				}
+				shiftGHR(1);
 			}
 			else {
-				shiftGHR(0);
 				int ndx = getPredictionNdx();
 				int predictionNum = predictors[ndx];
-				if(predictionNum == 0 || predictionNum == 1) {
+				if(predictionNum < 2) {
 					correctPredictions++;
 				}
-				if(predictionNum == 3 || predictionNum == 1 || predictionNum == 2) {
+				if(predictionNum > 0) {
 					predictors[ndx]--;
 				}
+				shiftGHR(0);
 			}
 			totalPredictions++;
 			pc++;
@@ -528,7 +528,7 @@ public class lab5 {
 		int num = 0;
 		int size = ghr.length - 1;
 		int ndx = 0;
-		while(size <= 0) {
+		while(size >= 0) {
 			num = num | (ghr[ndx++] << size);
 			size--;
 		}
@@ -537,8 +537,8 @@ public class lab5 {
 
 	private void calcBranchAccuracy() {
 		double accuracy = ((double)correctPredictions / totalPredictions)*100;
-		DecimalFormat f = new DecimalFormat("##.00");
-		System.out.println("accuracy " + f.format(accuracy) + "% (" + correctPredictions + " correct predictions, " + totalPredictions + " predictions");
+		System.out.printf("accuracy %.2f ", accuracy);
+		System.out.println("% (" + correctPredictions + " correct predictions, " + totalPredictions + " predictions");
 	}
 
 	private void initGHR(int size) {
