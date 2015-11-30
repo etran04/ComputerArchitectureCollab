@@ -80,6 +80,13 @@ j EndEnd
 
 # end main function 
 
+Plot:  
+	sw $a0, 0($sp)
+	addi $sp, $sp, 1
+	sw $a1, 0($sp)
+	addi $sp, $sp, 1
+	jr $ra
+
 # a0, a1, a2 - arguments (x coord, y coord, radius)
 CircleFunction:
 	add $s5, $a0, $0 	# xc
@@ -97,11 +104,11 @@ CircleFunction:
 	sub $s3, $t1, $t0	# diagonalInc
 	addi $s4, $0, 6		# rightInc
 	
-	addi $s1, $s1, 1
+	#addi $s1, $s1, 1
 	
 CircleLoop: 
 	slt $t0, $s0, $s1
-	bne $0, $t0, EndCircleLoop
+	beq $0, $t0, EndCircleLoop
 	
 	add $a0, $s5, $s0	
 	add $a1, $s6, $s1 
@@ -272,12 +279,5 @@ skipSetYErr:
 EndLineLoop:
 	add $ra, $0, $t7
 	 jr $ra		
-	
-Plot:  
-	sw $a0, 0($sp)
-	addi $sp, $sp, 1
-	sw $a1, 0($sp)
-	addi $sp, $sp, 1
-	jr $ra
 	
 EndEnd:

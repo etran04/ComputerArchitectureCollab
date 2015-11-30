@@ -34,6 +34,9 @@ public class lab5 {
 	private int stallCounter;
 	private int[] ghr;
 	private int[] predictors;
+	
+	// drawing counter
+	private int coordinatesCounter; 
 
 
 	/* Default constructor for our simulator */
@@ -116,6 +119,7 @@ public class lab5 {
 		this.stallCounter = 0;
 		this.correctPredictions = 0;
 		this.totalPredictions = 0;
+		this.coordinatesCounter = 0; 
 	}
 
 	/* Used for adding a label to a hashtable */
@@ -224,6 +228,9 @@ public class lab5 {
 		this.jumpTaken = false;
 		this.useAfterLoadStall = false;
 		this.stallCounter = 0;
+		this.correctPredictions = 0;
+		this.totalPredictions = 0;
+		this.coordinatesCounter = 0; 
 		System.out.println("\n\t Simulator reset");
 	}
 
@@ -304,7 +311,7 @@ public class lab5 {
 							stallCounter--;
 						}
 						Instruction instr = instructions.get(pc);
-						instr.printSummary();
+						//instr.printSummary();
 						executeInstructions(instr, runCommand);
 					}
 					if (!runCommand) {
@@ -456,6 +463,7 @@ public class lab5 {
 			pc++;
 			break;
 			case "sw":
+			this.coordinatesCounter++;
 			dataMemory[instr.getOffset() + registers[stringToRegister.get(instr.getDest())]] =
 			registers[stringToRegister.get(instr.getSource1())];
 			pc++;
@@ -547,8 +555,28 @@ public class lab5 {
 		predictors = new int[(int)Math.pow(2, size)];
 	}
 
+	private void outputCSV() throws IOException {
+        //output files
+        String outputFile = "coordinates.csv";
+        FileWriter csvFileWriter = new FileWriter(new File(outputFile));
+        BufferedWriter csvBufferedWriter = new BufferedWriter(csvFileWriter);
+        
+        int numberCoordinates = this.coordinatesCounter / 2; 
+        int memCounter = 0; 
+        for (int i = 0; i < numberCoordinates; i++) {
+        	//System.out.println(this.dataMemory[memCounter] + ", " + this.dataMemory[memCounter + 1]);
+        	csvBufferedWriter.write(this.dataMemory[memCounter] + ", " + this.dataMemory[memCounter + 1]);
+        	csvBufferedWriter.newLine();
+        	memCounter += 2;
+        }
+        csvBufferedWriter.flush();
+        csvBufferedWriter.close();
+        csvFileWriter.close();
+
+	}
+	
 	/* Runs the simulator */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		lab5 simulator = new lab5();
 		String[] stepArray;
 		Scanner scanner = new Scanner(System.in);
@@ -693,7 +721,7 @@ public class lab5 {
 						simulator.clear();
 						break;
 						case 'o':
-
+						simulator.outputCSV();
 						break;
 						case 'b':
 						simulator.calcBranchAccuracy();
