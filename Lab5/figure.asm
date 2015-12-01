@@ -282,3 +282,4 @@ EndLineLoop:
 	jr $ra
 
 EndEnd:
+	add $s5, $0, $s5
