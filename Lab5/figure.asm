@@ -176,15 +176,13 @@ LineFunction:
 
 	sub $t0, $s3, $s1
 	slt $t1, $t0, $0
-	addi $t2, $0, 1
-	bne $t1, $t2, noAbs1
+	beq $t1, $0, noAbs1
 	sub $t0, $0, $t0
 
 noAbs1:
 	sub $t1, $s2, $s0
 	slt $t2, $t1, $0
-	addi $t3, $0, 1
-	bne $t2, $t3, noAbs2
+	beq $t2, $0, noAbs2
 	sub $t1, $0, $t1
 
 noAbs2:
@@ -228,8 +226,7 @@ skipSwap2:
 	sub $s5, $s2, $s0	# deltax
 	sub $s6, $s3, $s1  	# deltay
 	slt $t0, $s6, $0
-	addi $t1, $0, 1
-	bne $t0, $t1, noAbs3
+	beq $t0, $0, noAbs3
 	sub $s6, $0, $s6
 
 noAbs3:
