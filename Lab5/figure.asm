@@ -168,7 +168,7 @@ LineFunction:
 	add $s1, $0, $a1	# y0
 	add $s2, $0, $a2	# x1
 	add $s3, $0, $a3	# y1
-										# $s4 = st
+						# $s4 = st
 	add $t7, $0, $ra
 
 	sub $t0, $s3, $s1
@@ -231,7 +231,7 @@ noAbs3:
 	add $t8, $s1, $0	# y
 						# t9 = ystep
 
-	slt $t0, $s1, $s3
+	slt $t0, $s1, $s3	# y0 < y1
 	beq $t0, $0, setYStepElse
 	addi $t9, $0, 1
 	j skipSetElse
@@ -253,8 +253,8 @@ LineLoop:
 	j EndLineCond1
 
 ElsePlot:
-	add $a0, $0, $t8
-	add $a1, $0, $t0
+	add $a0, $0, $t0
+	add $a1, $0, $t8
 	jal Plot
 
 EndLineCond1:
@@ -262,8 +262,8 @@ EndLineCond1:
 
 	sll $t2, $s7, 1
 	addi $t2, $t2, 1	# include 2*error in condition
-	slt $t3, $s5, $t2
-	beq $t3, $0, skipSetYErr
+	slt $t3, $s5, $t2	# if deltax < (2 * error) 
+	beq $t3, $0, skipSetYErr #posible error
 	add $t8, $t8, $t9
 	sub $s7, $s7,$s5
 
