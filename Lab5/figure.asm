@@ -69,8 +69,8 @@ addi $a2, $0, 20
 addi $a3, $0, 95
 jal LineFunction
 
-#mouth center
-addi $a0, $0, 25
+#mouth right
+addi $a0, $0, 35
 addi $a1, $0, 90
 addi $a2, $0, 40
 addi $a3, $0, 95
@@ -104,10 +104,10 @@ CircleFunction:
 	sub $s3, $t1, $t0	# diagonalInc
 	addi $s4, $0, 6		# rightInc
 
-	#addi $s1, $s1, 1
+	addi $t1, $s1, 1
 
 CircleLoop:
-	slt $t0, $s0, $s1
+	slt $t0, $s0, $t1
 	beq $0, $t0, EndCircleLoop
 
 	add $a0, $s5, $s0
