@@ -255,7 +255,7 @@ LineLoop:
 	add $a0, $0, $t8
 	add $a1, $0, $t0
 	jal Plot
-	j endLineCond1
+	j EndLineCond1
 
 ElsePlot:
 	add $a0, $0, $t8
