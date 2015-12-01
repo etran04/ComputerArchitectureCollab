@@ -173,27 +173,27 @@ LineFunction:
 
 	sub $t0, $s3, $s1
 	slt $t1, $t0, $0
-	beq $t1, $0, noAbs1
+	beq $t1, $0, noAbs1	# check if (y1 - y0) is negative 
 	sub $t0, $0, $t0
 
 noAbs1:
 	sub $t1, $s2, $s0
 	slt $t2, $t1, $0
-	beq $t2, $0, noAbs2
+	beq $t2, $0, noAbs2	# check if (x1 - x0) is negative 
 	sub $t1, $0, $t1
 
 noAbs2:
-	slt $t0, $t1, $t0
-	beq $t0, $0, AbsElse
+	slt $t0, $t1, $t0	# check if abs(x1-x0) < abs(y1-y0)
+	beq $t0, $0, AbsElse	
 	addi $s4, $0, 1
 	j skipAbsElse
 
 AbsElse:
-	add $s4, $0, $0
+	addi $s4, $0, 0
 
 skipAbsElse:
 	addi $t0, $0, 1
-	bne $t0, $s4, skipSwap1
+	bne $t0, $s4, skipSwap1	# if st != 1, then skip swap1
 
 	#swap x0, y0
 	add $t0, $s1, $0
@@ -206,7 +206,8 @@ skipAbsElse:
 	add $s2, $t0, $0
 
 skipSwap1:
-	slt $t0, $s0, $s2
+	addi $t4, $s2, 1
+	slt $t0, $s0, $t4	# if x0 <= x1, then skip swap2
 	bne $t0, $0, skipSwap2
 
 	#swap x0, x1
@@ -223,7 +224,7 @@ skipSwap2:
 	sub $s5, $s2, $s0	# deltax
 	sub $s6, $s3, $s1  	# deltay
 	slt $t0, $s6, $0
-	beq $t0, $0, noAbs3
+	beq $t0, $0, noAbs3 # check if (y1 - y0) is negative
 	sub $s6, $0, $s6
 
 noAbs3:
@@ -262,8 +263,8 @@ EndLineCond1:
 
 	sll $t2, $s7, 1
 	addi $t2, $t2, 1	# include 2*error in condition
-	slt $t3, $s5, $t2	# if deltax < (2 * error) 
-	beq $t3, $0, skipSetYErr #posible error
+	slt $t3, $s5, $t2	# if deltax < (2 * error) + 1
+	beq $t3, $0, skipSetYErr 
 	add $t8, $t8, $t9
 	sub $s7, $s7,$s5
 
