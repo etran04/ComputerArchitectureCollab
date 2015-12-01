@@ -105,10 +105,8 @@ CircleFunction:
 	sub $s3, $t1, $t0	# diagonalInc = 10 - (4 * r)
 	addi $s4, $0, 6		# rightInc = 6
 
-	addi $t1, $s1, 1
-
 CircleLoop:
-	slt $t0, $s0, $t1
+	slt $t0, $s0, $s1
 	beq $0, $t0, EndCircleLoop
 
 	add $a0, $s5, $s0
@@ -143,8 +141,7 @@ CircleLoop:
 	sub $a1, $s6, $s0
 	jal Plot
 
-	addi $t0, $0, -1
-	slt $t0, $t0, $s2
+	slt $t0, $0, $s2
 
 	beq $t0, $0, CircleElse
 	add $s2, $s2, $s3		# g += diaganolInc
