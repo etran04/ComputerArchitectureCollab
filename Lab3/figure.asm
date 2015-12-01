@@ -60,7 +60,7 @@ jal CircleFunction
 addi $a0, $0, 25
 addi $a1, $0, 90
 addi $a2, $0, 35
-addi $a3, $0, 90
+addi $a3, $0, 95
 jal LineFunction
 
 #mouth left
@@ -77,7 +77,7 @@ addi $a2, $0, 40
 addi $a3, $0, 95
 jal LineFunction
 
-j EndEnd
+j EndFinal
 
 # end main function
 
@@ -95,19 +95,20 @@ CircleFunction:
 	add $s7, $a2, $0 	# r
 	add $t9, $0, $ra
 
-	add $s0, $0, $0 	# x = 0
-	add $s1, $0, $a2	# y = r
+	add $s0, $0, $0 	# x
+	add $s1, $0, $a2	# y
 	sll $t0, $a2, 1
 	addi $t1, $0, 3
-	sub $s2, $t1, $t0 	# g = 3 - (2 * r)
+	sub $s2, $t1, $t0 	# g
 	sll $t0, $a2, 2
 	addi $t1, $0, 10
-	sub $s3, $t1, $t0	# diagonalInc = 10 - (4 * r)
-	addi $s4, $0, 6		# rightInc = 6
-	
+	sub $s3, $t1, $t0	# diagonalInc
+	addi $s4, $0, 6		# rightInc
+
+	addi $t1, $s1, 1
+
 CircleLoop:
-	addi $t4, $s1, 1
-	slt $t0, $s0, $t4
+	slt $t0, $s0, $t1
 	beq $0, $t0, EndCircleLoop
 
 	add $a0, $s5, $s0
@@ -142,20 +143,22 @@ CircleLoop:
 	sub $a1, $s6, $s0
 	jal Plot
 
-	slt $t0, $0, $s2		
+	addi $t0, $0, -1
+	slt $t0, $t0, $s2
+
 	beq $t0, $0, CircleElse
-	add $s2, $s2, $s3		# g += diaganolInc
-	addi $s3, $s3, 8		# diaganolInc += 8
-	addi $s1, $s1, -1		# y -= 1
+	add $s2, $s2, $s3
+	addi $s3, $s3, 8
+	addi $s1, $s1, -1
 	j EndCircleCond
 
 CircleElse:
-	add $s2, $s2, $s4		# g += rightInc
-	addi $s3, $s3, 4		# diaganolInc += 4
+	add $s2, $s2, $s4
+	addi $s3, $s4, 4
 
 EndCircleCond:
-	addi $s4, $s4, 4		# rightInc += 4
-	addi $s0, $s0, 1		# x++
+	addi $s4, $s4, 4
+	addi $s0, $s0, 1
 	j CircleLoop
 
 EndCircleLoop:
@@ -168,32 +171,34 @@ LineFunction:
 	add $s1, $0, $a1	# y0
 	add $s2, $0, $a2	# x1
 	add $s3, $0, $a3	# y1
-						# $s4 = st
+										# $s4 = st
 	add $t7, $0, $ra
 
 	sub $t0, $s3, $s1
 	slt $t1, $t0, $0
-	beq $t1, $0, noAbs1	# check if (y1 - y0) is negative 
+	addi $t2, $0, 1
+	bne $t1, $t2, noAbs1
 	sub $t0, $0, $t0
 
 noAbs1:
 	sub $t1, $s2, $s0
 	slt $t2, $t1, $0
-	beq $t2, $0, noAbs2	# check if (x1 - x0) is negative 
+	addi $t3, $0, 1
+	bne $t2, $t3, noAbs2
 	sub $t1, $0, $t1
 
 noAbs2:
-	slt $t0, $t1, $t0	# check if abs(x1-x0) < abs(y1-y0)
-	beq $t0, $0, AbsElse	
+	slt $t0, $t1, $t0
+	beq $t0, $0, AbsElse
 	addi $s4, $0, 1
 	j skipAbsElse
 
 AbsElse:
-	addi $s4, $0, 0
+	add $s4, $0, $0
 
 skipAbsElse:
 	addi $t0, $0, 1
-	bne $t0, $s4, skipSwap1	# if st != 1, then skip swap1
+	bne $t0, $s4, skipSwap1
 
 	#swap x0, y0
 	add $t0, $s1, $0
@@ -206,8 +211,7 @@ skipAbsElse:
 	add $s2, $t0, $0
 
 skipSwap1:
-	addi $t4, $s2, 1
-	slt $t0, $s0, $t4	# if x0 <= x1, then skip swap2
+	slt $t0, $s0, $s2
 	bne $t0, $0, skipSwap2
 
 	#swap x0, x1
@@ -224,7 +228,8 @@ skipSwap2:
 	sub $s5, $s2, $s0	# deltax
 	sub $s6, $s3, $s1  	# deltay
 	slt $t0, $s6, $0
-	beq $t0, $0, noAbs3 # check if (y1 - y0) is negative
+	addi $t1, $0, 1
+	bne $t0, $t1, noAbs3
 	sub $s6, $0, $s6
 
 noAbs3:
@@ -232,7 +237,7 @@ noAbs3:
 	add $t8, $s1, $0	# y
 						# t9 = ystep
 
-	slt $t0, $s1, $s3	# y0 < y1
+	slt $t0, $s1, $s3
 	beq $t0, $0, setYStepElse
 	addi $t9, $0, 1
 	j skipSetElse
@@ -254,8 +259,8 @@ LineLoop:
 	j EndLineCond1
 
 ElsePlot:
-	add $a0, $0, $t0
-	add $a1, $0, $t8
+	add $a0, $0, $t8
+	add $a1, $0, $t0
 	jal Plot
 
 EndLineCond1:
@@ -263,8 +268,8 @@ EndLineCond1:
 
 	sll $t2, $s7, 1
 	addi $t2, $t2, 1	# include 2*error in condition
-	slt $t3, $s5, $t2	# if deltax < (2 * error) + 1
-	beq $t3, $0, skipSetYErr 
+	slt $t3, $s5, $t2
+	beq $t3, $0, skipSetYErr
 	add $t8, $t8, $t9
 	sub $s7, $s7,$s5
 
@@ -276,5 +281,5 @@ EndLineLoop:
 	add $ra, $0, $t7
 	jr $ra
 
-EndEnd:
-	add $s5, $0, $s5
+EndFinal:
+	add $s0, $0, $s0
