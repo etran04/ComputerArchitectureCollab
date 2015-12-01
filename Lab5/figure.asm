@@ -61,6 +61,7 @@ addi $a0, $0, 25
 addi $a1, $0, 90
 addi $a2, $0, 35
 addi $a3, $0, 95
+jal LineFunction
 
 #mouth left
 addi $a0, $0, 25
@@ -278,6 +279,6 @@ skipSetYErr:
 
 EndLineLoop:
 	add $ra, $0, $t7
-	 jr $ra
+	jr $ra
 
 EndEnd:
