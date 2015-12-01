@@ -60,7 +60,7 @@ jal CircleFunction
 addi $a0, $0, 25
 addi $a1, $0, 90
 addi $a2, $0, 35
-addi $a3, $0, 95
+addi $a3, $0, 90
 jal LineFunction
 
 #mouth left
