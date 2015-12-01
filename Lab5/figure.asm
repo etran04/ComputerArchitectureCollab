@@ -95,15 +95,15 @@ CircleFunction:
 	add $s7, $a2, $0 	# r
 	add $t9, $0, $ra
 
-	add $s0, $0, $0 	# x
-	add $s1, $0, $a2	# y
+	add $s0, $0, $0 	# x = 0
+	add $s1, $0, $a2	# y = r
 	sll $t0, $a2, 1
 	addi $t1, $0, 3
-	sub $s2, $t1, $t0 	# g
+	sub $s2, $t1, $t0 	# g = 3 - (2 * r)
 	sll $t0, $a2, 2
 	addi $t1, $0, 10
-	sub $s3, $t1, $t0	# diagonalInc
-	addi $s4, $0, 6		# rightInc
+	sub $s3, $t1, $t0	# diagonalInc = 10 - (4 * r)
+	addi $s4, $0, 6		# rightInc = 6
 
 	addi $t1, $s1, 1
 
@@ -147,18 +147,18 @@ CircleLoop:
 	slt $t0, $t0, $s2
 
 	beq $t0, $0, CircleElse
-	add $s2, $s2, $s3
-	addi $s3, $s3, 8
-	addi $s1, $s1, -1
+	add $s2, $s2, $s3		# g += diaganolInc
+	addi $s3, $s3, 8		# diaganolInc += 8
+	addi $s1, $s1, -1		# y -= 1
 	j EndCircleCond
 
 CircleElse:
-	add $s2, $s2, $s4
-	addi $s3, $s4, 4
+	add $s2, $s2, $s4		# g += rightInc
+	addi $s3, $s3, 4		# diaganolInc += 4
 
 EndCircleCond:
-	addi $s4, $s4, 4
-	addi $s0, $s0, 1
+	addi $s4, $s4, 4		# rightInc += 4
+	addi $s0, $s0, 1		# x++
 	j CircleLoop
 
 EndCircleLoop:
