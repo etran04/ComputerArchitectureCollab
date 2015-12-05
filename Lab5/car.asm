@@ -4,17 +4,52 @@ addi $a1, $0, 0
 addi $a2, $0, 20
 jal CircleFunction
 
-#left leg
+#right wheel
 addi $a0, $0, 30
 addi $a1, $0, 0
 addi $a2, $0, 20
+jal CircleFunction
+
+#bottom body
+addi $a0, $0, -60
+addi $a1, $0, 20
+addi $a2, $0, 60
+addi $a3, $0, 20
 jal LineFunction
 
-#mouth right
-addi $a0, $0, 35
-addi $a1, $0, 90
+#left body
+addi $a0, $0, -60
+addi $a1, $0, 20
+addi $a2, $0, -60
+addi $a3, $0, 80
+jal LineFunction
+
+#right body
+addi $a0, $0, 60
+addi $a1, $0, 20
+addi $a2, $0, 60
+addi $a3, $0, 80
+jal LineFunction
+
+#top body
+addi $a0, $0, 60
+addi $a1, $0, 80
+addi $a2, $0, -60
+addi $a3, $0, 80
+jal LineFunction
+
+#left window
+addi $a0, $0, 40
+addi $a1, $0, 80
 addi $a2, $0, 40
-addi $a3, $0, 95
+addi $a3, $0, 60
+jal LineFunction
+
+#bottom window
+addi $a0, $0, 40
+addi $a1, $0, 60
+addi $a2, $0, 60
+addi $a3, $0, 60
 jal LineFunction
 
 j EndEnd
@@ -44,7 +79,7 @@ CircleFunction:
 	addi $t1, $0, 10
 	sub $s3, $t1, $t0	# diagonalInc = 10 - (4 * r)
 	addi $s4, $0, 6		# rightInc = 6
-	
+
 CircleLoop:
 	addi $t4, $s1, 1
 	slt $t0, $s0, $t4
@@ -82,7 +117,7 @@ CircleLoop:
 	sub $a1, $s6, $s0
 	jal Plot
 
-	slt $t0, $0, $s2		
+	slt $t0, $0, $s2
 	beq $t0, $0, CircleElse
 	add $s2, $s2, $s3		# g += diaganolInc
 	addi $s3, $s3, 8		# diaganolInc += 8
@@ -113,18 +148,18 @@ LineFunction:
 
 	sub $t0, $s3, $s1
 	slt $t1, $t0, $0
-	beq $t1, $0, noAbs1	# check if (y1 - y0) is negative 
+	beq $t1, $0, noAbs1	# check if (y1 - y0) is negative
 	sub $t0, $0, $t0
 
 noAbs1:
 	sub $t1, $s2, $s0
 	slt $t2, $t1, $0
-	beq $t2, $0, noAbs2	# check if (x1 - x0) is negative 
+	beq $t2, $0, noAbs2	# check if (x1 - x0) is negative
 	sub $t1, $0, $t1
 
 noAbs2:
 	slt $t0, $t1, $t0	# check if abs(x1-x0) < abs(y1-y0)
-	beq $t0, $0, AbsElse	
+	beq $t0, $0, AbsElse
 	addi $s4, $0, 1
 	j skipAbsElse
 
@@ -204,7 +239,7 @@ EndLineCond1:
 	sll $t2, $s7, 1
 	addi $t2, $t2, 1	# include 2*error in condition
 	slt $t3, $s5, $t2	# if deltax < (2 * error) + 1
-	beq $t3, $0, skipSetYErr 
+	beq $t3, $0, skipSetYErr
 	add $t8, $t8, $t9
 	sub $s7, $s7,$s5
 

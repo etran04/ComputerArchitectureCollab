@@ -1,4 +1,4 @@
-/* 
+/*
  * @authors: Jordan Tang & Eric Tran
  * CSC 315
  * Professor Seng
@@ -15,7 +15,7 @@ public class lab5 {
 	private Hashtable<Integer, String> registersToString;
     private Hashtable<String, Integer> stringToRegister;
 	private static String invalidOp = "";
-	
+
 	private ArrayList<Instruction> instructions;
 	private int pc;
 	private int[] dataMemory;
@@ -24,11 +24,11 @@ public class lab5 {
 	private int totalPredictions;
 	private int[] ghr;
 	private int[] predictors;
-	
+
 	// drawing counter
-	private int coordinatesCounter; 
-	
-	
+	private int coordinatesCounter;
+
+
 	/* Default constructor for our simulator */
 	public lab5() {
 		this.labelsLocations = new Hashtable<String, Integer>();
@@ -37,7 +37,7 @@ public class lab5 {
 		this.instructions = new ArrayList<Instruction>();
 		this.dataMemory = new int[8192];
 		this.registers = new int[32];
-		
+
 		this.registersToString.put(0, "$0");
 		this.registersToString.put(2, "$v0");
 		this.registersToString.put(3, "$v1");
@@ -56,7 +56,7 @@ public class lab5 {
 		this.registersToString.put(16, "$s0");
 		this.registersToString.put(17, "$s1");
 		this.registersToString.put(18, "$s2");
-		this.registersToString.put(19, "$s3");		
+		this.registersToString.put(19, "$s3");
 		this.registersToString.put(20, "$s4");
 		this.registersToString.put(21, "$s5");
 		this.registersToString.put(22, "$s6");
@@ -93,15 +93,15 @@ public class lab5 {
         this.stringToRegister.put("$t9", 25);
         this.stringToRegister.put("$sp", 29);
         this.stringToRegister.put("$ra", 31);
-		
+
 		this.pc = 0;
 	}
-	
+
 	/* Used for adding a label to a hashtable */
 	void addLabel(String label, int lineNumber) {
 		labelsLocations.put(label, lineNumber);
 	}
-	
+
 	/* Helper method for printing out list of instructions */
 	void printInstructions() {
 		for (int i = 0; i < instructions.size(); i++) {
@@ -109,15 +109,15 @@ public class lab5 {
 		}
 		System.out.println("List size: " + instructions.size());
 	}
-	
+
 	/* Used for parsing a simple instruction */
 	void parseSimpleInstructions(String currentLine, int lineNumber) throws InvalidCommandException{
 		StringTokenizer tokens = new StringTokenizer(currentLine, ",");
 		String[] temp = tokens.nextToken().trim().split("\\s+");
 		String opCode = temp[0].trim();
-		
+
 		String param1 = "", param2 = "", param3 = "";
-		
+
 		if (opCode.contains("$")) {
 			// Check for opCode where 1st params are not spaced correctly. (eg. beq$t0, ...)
 			param1 = opCode.substring(opCode.indexOf('$'));
@@ -125,11 +125,11 @@ public class lab5 {
 
 			if (tokens.hasMoreTokens())
 				param2 = tokens.nextToken().trim();
-			if (tokens.hasMoreTokens()) 
+			if (tokens.hasMoreTokens())
 				param3 = tokens.nextToken().trim();
 		}
-		
-		if (opCode.equals("and") || opCode.equals("or") ||  opCode.equals("add") || 
+
+		if (opCode.equals("and") || opCode.equals("or") ||  opCode.equals("add") ||
 			opCode.equals("addi") || opCode.equals("sll") || opCode.equals("sub") ||
 			opCode.equals("slt") || opCode.equals("beq") || opCode.equals("bne")) {
 				if (param1.equals(""))
@@ -138,27 +138,27 @@ public class lab5 {
 					param2 = tokens.nextToken().trim();
 				if (param3.equals(""))
 					param3 = tokens.nextToken().trim();
-				
-				if (param3.contains("#")) 
+
+				if (param3.contains("#"))
 					param3 = param3.substring(0, param3.indexOf('#')).trim();
 
-				if (opCode.equals("and") || opCode.equals("add") || opCode.equals("or") || opCode.equals("sub") || opCode.equals("slt")) 
+				if (opCode.equals("and") || opCode.equals("add") || opCode.equals("or") || opCode.equals("sub") || opCode.equals("slt"))
 					instructions.add(new Instruction(opCode, param2, param3, param1, false));
-				else if (opCode.equals("sll")) 
+				else if (opCode.equals("sll"))
 					instructions.add(new Instruction(opCode, param2, param1, param3));
-				else 
+				else
 					instructions.add(new Instruction(opCode, param2, param3, param1, true));
 		}
 		else if (opCode.equals("lw") || opCode.equals("sw")) {
-			// Two arguments after op code	
+			// Two arguments after op code
 			if (param1.equals(""))
 				param1 = temp[1].trim();
 			if (param2.equals(""))
 				param2 = tokens.nextToken().trim();
-			
+
 			param3 = param2.substring(param2.indexOf("$"), param2.indexOf("$") + 3);
 			param2 = param2.substring(0, param2.indexOf('$') - 1);
-			
+
 			instructions.add(new Instruction(opCode, param1, param2, param3, false));
 		}
 		else if (opCode.equals("j") || opCode.equals("jr") || opCode.equals("jal")) {
@@ -172,7 +172,7 @@ public class lab5 {
             throw new InvalidCommandException();
         }
 	}
-	
+
 	/* Used for parsing instructions with a label on the same line */
 	void parseInstructionWithLabel(String currentLine, int lineNumber) throws InvalidCommandException {
 		currentLine = currentLine.substring(currentLine.indexOf(':') + 1).trim();
@@ -193,7 +193,7 @@ public class lab5 {
 		this.pc = 0;
 		this.correctPredictions = 0;
 		this.totalPredictions = 0;
-		this.coordinatesCounter = 0; 
+		this.coordinatesCounter = 0;
 		System.out.println("\n\t Simulator reset");
 	}
 
@@ -204,13 +204,13 @@ public class lab5 {
 			if (i != 1 && i != 26 && i != 27 && i != 28 && i != 30){
 				if (i % 4 == 0 && i != 0)
                     System.out.println(this.registersToString.get(i) + " = " + registers[i] + " \t");
-				else 
+				else
 					System.out.print(this.registersToString.get(i) + " = " + registers[i] + " \t");
 			}
 		}
 		System.out.println("\n");
 	}
-	
+
 	/* Used for the 'h' command. Prints out the help */
 	void printHelp() {
 		System.out.println("\nh = show help");
@@ -427,8 +427,8 @@ public class lab5 {
         FileWriter csvFileWriter = new FileWriter(new File(outputFile));
         BufferedWriter csvBufferedWriter = new BufferedWriter(csvFileWriter);
         
-        int numberCoordinates = this.coordinatesCounter / 2; 
-        int memCounter = 0; 
+        int numberCoordinates = this.coordinatesCounter / 2;
+        int memCounter = 0;
         for (int i = 0; i < numberCoordinates; i++) {
         	//System.out.println(this.dataMemory[memCounter] + ", " + this.dataMemory[memCounter + 1]);
         	csvBufferedWriter.write(this.dataMemory[memCounter] + ", " + this.dataMemory[memCounter + 1]);
@@ -440,14 +440,14 @@ public class lab5 {
         csvFileWriter.close();
 
 	}
-    
+
     /* Runs the simulator */
 	public static void main(String[] args) throws IOException {
 		lab5 simulator = new lab5();
 		String[] stepArray;
 		Scanner scanner = new Scanner(System.in);
         int num_inst = 0;
-		
+
 		if (args.length == 0) {
 			System.out.println("usage: java lab5 [.asm file] [optional script file]");
 		}
@@ -458,7 +458,7 @@ public class lab5 {
 			try {
 				scanner = new Scanner(asmFile);
 				String currLine = "";
-				
+
 				// First pass
 				int lineNumber = 0;
 				while (scanner.hasNextLine()) {
@@ -469,7 +469,7 @@ public class lab5 {
 							String label = tokens.nextToken();
 							if(tokens.hasMoreTokens())
 								simulator.addLabel(label, lineNumber++);
-							else 
+							else
 								nextLabel = label;
 						}
 						else if(!nextLabel.equals("")){
@@ -481,22 +481,22 @@ public class lab5 {
                         }
 					}
 				}
-				
+
 				lineNumber = 0;
 				// Second pass
 				scanner = new Scanner(asmFile);
 				while (scanner.hasNextLine()) {
                     currLine = scanner.nextLine().trim();
-					// Line is not blank, and doesn't start with a comment 
+					// Line is not blank, and doesn't start with a comment
 					if (currLine.length() != 0 && currLine.charAt(0) != '#') {
 						// There is a label
 						if (currLine.contains(":")) {
 							// Label with instruction line
-							if (currLine.charAt(currLine.length() - 1) != ':') 
+							if (currLine.charAt(currLine.length() - 1) != ':')
 								simulator.parseInstructionWithLabel(currLine, lineNumber++);
 						}
 						// No label, just a simple instruction
-						else 
+						else
 							simulator.parseSimpleInstructions(currLine, lineNumber++);
 					}
 				}
@@ -541,7 +541,7 @@ public class lab5 {
 				while (command.charAt(0) != 'q') {
                     String[] inputs = command.split("\\s+");
 					switch(command.charAt(0)) {
-					case 'h': 
+					case 'h':
 						simulator.printHelp();
 						break;
 					case 'd':
@@ -564,7 +564,7 @@ public class lab5 {
 							simulator.step(1, false);
 						}
 						break;
-					case 'r': 
+					case 'r':
                         simulator.runProgram();
 						break;
 					case 'm':
